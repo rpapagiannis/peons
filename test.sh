@@ -6,6 +6,8 @@ staging="$(mktemp -d "$PWD/build/.peons-tests.XXXXXX")"
 trap 'rm -rf "$staging"' EXIT
 xcrun swiftc -swift-version 5 -module-cache-path "$staging/module-cache" Sources/Characters.swift Sources/PetModel.swift Tests/ModelTests.swift -o "$staging/model-tests"
 "$staging/model-tests"
+xcrun swiftc -swift-version 5 -module-cache-path "$staging/module-cache" Sources/Characters.swift Sources/PetModel.swift Tests/RoamingTests.swift -o "$staging/roaming-tests"
+"$staging/roaming-tests"
 xcrun swiftc -swift-version 5 -module-cache-path "$staging/module-cache" Sources/Characters.swift Sources/PetModel.swift Sources/CharacterArtwork.swift Sources/SpriteRenderer.swift Tests/ArtworkTests.swift -o "$staging/artwork-tests" -framework AppKit
 "$staging/artwork-tests"
 xcrun swiftc -swift-version 5 -module-cache-path "$staging/module-cache" Sources/Characters.swift Sources/PetModel.swift Sources/CharacterArtwork.swift Sources/SpriteRenderer.swift Tests/SpriteHitTests.swift -o "$staging/sprite-hit-tests" -framework AppKit
