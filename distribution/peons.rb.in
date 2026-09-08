@@ -1,0 +1,18 @@
+# Template only. Replace every @...@ field using the final, notarized release.
+# Save as Casks/peons.rb in your Homebrew tap after configuration.
+cask "peons" do
+  version "@VERSION@"
+  sha256 "@SHA256@"
+
+  url "@DOWNLOAD_URL@"
+  name "Peons"
+  desc "Tiny desktop companion with movement and recorded voice lines"
+  homepage "@HOMEPAGE@"
+
+  depends_on macos: :sonoma
+  depends_on arch: :arm64
+
+  app "Peons.app"
+
+  uninstall quit: "local.rafail.pickle-rick-pet"
+end

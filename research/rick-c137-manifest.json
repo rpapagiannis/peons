@@ -1,0 +1,172 @@
+{
+  "cesp_version": "1.0",
+  "name": "rick-c137",
+  "display_name": "Rick C-137",
+  "version": "1.0.0",
+  "description": "The ultimate SFW Rick Sanchez pack: all Rick Sanchez sounds plus the family-friendly Rick and Morty voice lines, merged into one pack.",
+  "author": {
+    "name": "Maksym Fedorchuk",
+    "github": "maksym-fedorchuk-quarks-tech"
+  },
+  "license": "CC-BY-NC-4.0",
+  "language": "en",
+  "tags": [
+    "tv",
+    "cartoon",
+    "rick-and-morty"
+  ],
+  "categories": {
+    "input.required": {
+      "sounds": [
+        {
+          "file": "sounds/Rick_Sanchez_Drink_.mp3",
+          "label": "How bout that drink?",
+          "sha256": "cfc6140b4b3a9e7d0cb157058da190037638d3918549ed3054f87230ae9e3b08"
+        },
+        {
+          "file": "sounds/Rick_Sanchez_Whiskey_.mp3",
+          "label": "How bout some sotch wishkey, you got that around here?",
+          "sha256": "484735d15df39a9a4e02f25392b011a2ba2ec5be65b1ceae2de00fed1b340d64"
+        },
+        {
+          "file": "sounds/im_not_looking_for_judgement_just_a_yes_or_no.mp3",
+          "label": "I'm not looking for judgment, just a yes or no.",
+          "sha256": "f862e7b591f9e65a6ee3a101a8bc540605e9730fa05f95a5684ab88227d19d8b"
+        },
+        {
+          "file": "sounds/a_moment_of_your_time.mp3",
+          "label": "A moment of your time?",
+          "sha256": "50fdeaec04890d4df3641bc7e698fd05264891da5d31850f60ddaa01d6898150"
+        },
+        {
+          "file": "sounds/there_is_something_you_can_help.mp3",
+          "label": "There is something you can help with.",
+          "sha256": "070b8b1bf77e35382b707a5063692cd4da430b5292b22557e9f8cd6a0d6da951"
+        }
+      ]
+    },
+    "resource.limit": {
+      "sounds": [
+        {
+          "file": "sounds/Rick_Sanchez_Later.mp3",
+          "label": "Later.",
+          "sha256": "25980dac203eb97ae69d710724133178c30cb9e36b5dc8ff79d8e382bdbd6ae2"
+        },
+        {
+          "file": "sounds/guys_we_get_it_its_a_code_red_enough.mp3",
+          "label": "Guys, we get it. It's a code red. Enough.",
+          "sha256": "2e2956da8b5fffbe72e8dc2ba162cfc2ff416e658e0647e5d2e9792fd965e451"
+        }
+      ]
+    },
+    "session.end": {
+      "sounds": [
+        {
+          "file": "sounds/death_what_kind_instant.mp3",
+          "label": "Death. What kind? Instant.",
+          "sha256": "4897cef9a0948d2290d91c646bff756a12d7c049a8e6b2594807e9d5f49f65bb"
+        },
+        {
+          "file": "sounds/what_so_everyone_supposed_to_sleep_every_night.mp3",
+          "label": "What, so everyone's supposed to sleep every single night now?",
+          "sha256": "11a2e0333e2c917d23fba3ec5c94b4138f189d097e52b790bd895f0148c3b640"
+        },
+        {
+          "file": "sounds/bye.mp3",
+          "label": "Bye!",
+          "sha256": "3a2521af4ad1e913a51c9a3b11f39027b9420b446f393246eb853e11589c4f5f"
+        },
+        {
+          "file": "sounds/screw_this_im_out.mp3",
+          "label": "Screw this, I'm out!",
+          "sha256": "56e395bdfda17bba03db4c01860d5ba8a1cf0ca7561aa10f3362263181fdaf3f"
+        }
+      ]
+    },
+    "session.start": {
+      "sounds": [
+        {
+          "file": "sounds/Rick_Sanchez_What_.mp3",
+          "label": "What?",
+          "sha256": "88436c59211766d447219cbd4d9934f730eb4c9d60b21ba5fa85e581c073fc3d"
+        },
+        {
+          "file": "sounds/Rick_Sanchez_Whatever.mp3",
+          "label": "Whatever",
+          "sha256": "469cac8421fd73b29d22895f256cf710e12b7604a954e41b72ece812b0fe5d1a"
+        },
+        {
+          "file": "sounds/what_are_you_here_for_just_kidding_i_dont_care.mp3",
+          "label": "What are you here for? Just kidding, I don't care.",
+          "sha256": "53e7f0737009d0ede3a1209e4f12b09087bb888f87921f17f4e1a3a0163b8160"
+        },
+        {
+          "file": "sounds/hey_bro.mp3",
+          "label": "Hey bro!",
+          "sha256": "f394f53a8542d8aaee2901f9bebd4ba74f87dc2f5faa1d72b7435de7d05841e5"
+        },
+        {
+          "file": "sounds/hey_whats_up.mp3",
+          "label": "Hey, what's up?",
+          "sha256": "34479e0975c202ca146d29ec31c614796e9c623a47d2fa2602d7a5d6fddb86dc"
+        }
+      ]
+    },
+    "task.acknowledge": {
+      "sounds": [
+        {
+          "file": "sounds/i_can_do_anything.mp3",
+          "label": "I can do anything.",
+          "sha256": "cff726386fbf45130b79f5c803d875ff48cd2be11bf6447f13407d3c66dd3bcf"
+        },
+        {
+          "file": "sounds/wanting_a_dragon_isnt_an_idea.mp3",
+          "label": "Wanting a dragon isn't an idea.",
+          "sha256": "909cfba960efedb67f97477a21f117eeb95ee4ce8beafc17057b09157a1569cc"
+        }
+      ]
+    },
+    "task.complete": {
+      "sounds": [
+        {
+          "file": "sounds/Rick_Sanchez_Fun.mp3",
+          "label": "Have fun.",
+          "sha256": "36732b8ec6d4067f41dd54890f975334765b83d11d2636593398950bf99c8def"
+        },
+        {
+          "file": "sounds/Rick_Sanchez_Page.mp3",
+          "label": "Nice to be on the same page, every once in a while.",
+          "sha256": "dd210e1b47373f5fba9ce26aee7e3d9149e301fd30fa406efa92c4f2e7c0a020"
+        },
+        {
+          "file": "sounds/doesnt_make_a_lot_of_sense_but_stand_by_it.mp3",
+          "label": "Doesn't make a lot of sense, but gotta stand by it.",
+          "sha256": "4cdcec55fc4b4031167cadbef13a85924287b535e5d75ec1f75f37031fffe7f1"
+        }
+      ]
+    },
+    "task.error": {
+      "sounds": [
+        {
+          "file": "sounds/sorry_about_that.mp3",
+          "label": "Sorry about that.",
+          "sha256": "43de3efa811678e3321867749dd6074d82d5084cad80e65e7963dcff0bb10571"
+        }
+      ]
+    },
+    "user.spam": {
+      "sounds": [
+        {
+          "file": "sounds/Rick_Sanchez_Devil_.mp3",
+          "label": "So what are you like, the devil?",
+          "sha256": "75966c92062da974625238a9fc0412392e2704fea81f1579e397608171f00331"
+        },
+        {
+          "file": "sounds/Rick_Sanchez_Tax.mp3",
+          "label": "Can't believe our tax dollars pay for this.",
+          "sha256": "77ae870002290299bb8be354bd04ffd3cbdd6b5de4a218c204c65d1c86f229bc"
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,87 @@
+[
+  {
+    "audioAsset" : "rick/normalized/pickle_rick.wav",
+    "id" : "pickle_rick",
+    "text" : "I'm Pickle Rick!"
+  },
+  {
+    "audioAsset" : "rick/normalized/i_turned_myself_into_a_pickle.wav",
+    "id" : "i_turned_myself_into_a_pickle",
+    "text" : "I turned myself into a pickle."
+  },
+  {
+    "audioAsset" : "rick/normalized/hey_morty.wav",
+    "id" : "hey_morty",
+    "text" : "Hey Morty!"
+  },
+  {
+    "audioAsset" : "rick/normalized/Rick_Sanchez_Jerry_.wav",
+    "id" : "Rick_Sanchez_Jerry_.mp3",
+    "text" : "What're you asking me for jerry?"
+  },
+  {
+    "audioAsset" : "rick/normalized/Rick_Sanchez_Anything_Else_.wav",
+    "id" : "Rick_Sanchez_Anything_Else_.mp3",
+    "text" : "Anything else..."
+  },
+  {
+    "audioAsset" : "rick/normalized/Rick_Sanchez_Seriously_.wav",
+    "id" : "Rick_Sanchez_Seriously_.mp3",
+    "text" : "Seriously!?"
+  },
+  {
+    "audioAsset" : "rick/normalized/Rick_Sanchez_Fun.wav",
+    "id" : "Rick_Sanchez_Fun.mp3",
+    "text" : "Have fun."
+  },
+  {
+    "audioAsset" : "rick/normalized/Rick_Sanchez_Page.wav",
+    "id" : "Rick_Sanchez_Page.mp3",
+    "text" : "Nice to be on the same page, every once in a while."
+  },
+  {
+    "audioAsset" : "rick/normalized/Rick_Sanchez_What_.wav",
+    "id" : "Rick_Sanchez_What_.mp3",
+    "text" : "What!!"
+  },
+  {
+    "audioAsset" : "rick/normalized/Rick_Sanchez_Whatever.wav",
+    "id" : "Rick_Sanchez_Whatever.mp3",
+    "text" : "Whatever..."
+  },
+  {
+    "audioAsset" : "rick/normalized/Rick_Sanchez_Drink_.wav",
+    "id" : "Rick_Sanchez_Drink_.mp3",
+    "text" : "How bout that drink?"
+  },
+  {
+    "audioAsset" : "rick/normalized/Rick_Sanchez_Point.wav",
+    "id" : "Rick_Sanchez_Point.mp3",
+    "text" : "You're missing the point morty!"
+  },
+  {
+    "audioAsset" : "rick/normalized/Rick_Sanchez_Whiskey_.wav",
+    "id" : "Rick_Sanchez_Whiskey_.mp3",
+    "text" : "How bout some sotch wishkey, you got that around here?"
+  },
+  {
+    "audioAsset" : "rick/normalized/Rick_Sanchez_Later.wav",
+    "id" : "Rick_Sanchez_Later.mp3",
+    "text" : "Later."
+  },
+  {
+    "audioAsset" : "rick/normalized/Rick_Sanchez_Children.wav",
+    "id" : "Rick_Sanchez_Children.mp3",
+    "text" : "You really are your father's children."
+  },
+  {
+    "audioAsset" : "rick/normalized/Rick_Sanchez_Devil_.wav",
+    "id" : "Rick_Sanchez_Devil_.mp3",
+    "text" : "So what are you like, the devil?"
+  },
+  {
+    "audioAsset" : "rick/normalized/Rick_Sanchez_Tax.wav",
+    "id" : "Rick_Sanchez_Tax.mp3",
+    "text" : "Can't believe our tax dollars pay for this."
+  }
+]

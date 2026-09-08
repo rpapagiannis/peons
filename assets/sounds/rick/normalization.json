@@ -1,0 +1,509 @@
+{
+  "clips" : [
+    {
+      "gainDB" : 8.721679573209713,
+      "id" : "pickle_rick",
+      "input" : {
+        "channels" : 2,
+        "durationSeconds" : 1.9591836734693877,
+        "frames" : 86400,
+        "fullScaleSamples" : 0,
+        "rmsDBFS" : -28.721679573209713,
+        "samplePeakDBFS" : -13.050874427934396,
+        "sampleRate" : 44100
+      },
+      "originalFile" : "assets/sounds/rick/pickle_rick.mp3",
+      "originalSHA256" : "1f268ee2161d916eba7f133ed60650187cb5ba9ddd2d370cef2bd0f0c41b5fc3",
+      "output" : {
+        "channels" : 2,
+        "durationSeconds" : 1.9591836734693877,
+        "frames" : 86400,
+        "fullScaleSamples" : 0,
+        "rmsDBFS" : -20.000002005552094,
+        "samplePeakDBFS" : -4.329318704526675,
+        "sampleRate" : 44100
+      },
+      "outputFile" : "assets/sounds/rick/normalized/pickle_rick.wav",
+      "outputSHA256" : "827af16a6d5b842c2a1a6d4dfcc11ee69c8a8a982997b3ce7a5b5dfd205c0184",
+      "peakLimited" : false,
+      "sourceCommit" : "125e30394baa24b70958e69ac7d87a6f5f401428",
+      "sourceURL" : "https://raw.githubusercontent.com/Mr3zee/peonping-rick-and-morty-clean/v1.0.0/sounds/pickle_rick.mp3"
+    },
+    {
+      "gainDB" : 5.376795197502439,
+      "id" : "i_turned_myself_into_a_pickle",
+      "input" : {
+        "channels" : 2,
+        "durationSeconds" : 1.8683673469387756,
+        "frames" : 82395,
+        "fullScaleSamples" : 0,
+        "rmsDBFS" : -25.549246218547896,
+        "samplePeakDBFS" : -8.386795197502439,
+        "sampleRate" : 44100
+      },
+      "originalFile" : "assets/sounds/rick/i_turned_myself_into_a_pickle.mp3",
+      "originalSHA256" : "f2c27ed64799a4506950d00aefb0ad2d4cbf592d2e4dc9a3f5e47ff7c93ff6e2",
+      "output" : {
+        "channels" : 2,
+        "durationSeconds" : 1.8683673469387756,
+        "frames" : 82395,
+        "fullScaleSamples" : 0,
+        "rmsDBFS" : -20.172439564664707,
+        "samplePeakDBFS" : -3.010103154935409,
+        "sampleRate" : 44100
+      },
+      "outputFile" : "assets/sounds/rick/normalized/i_turned_myself_into_a_pickle.wav",
+      "outputSHA256" : "942e1fc2c5f8f2a7787d175a286256f4c104415000ff9b254b2e11aa455837f6",
+      "peakLimited" : true,
+      "sourceCommit" : "125e30394baa24b70958e69ac7d87a6f5f401428",
+      "sourceURL" : "https://raw.githubusercontent.com/Mr3zee/peonping-rick-and-morty-clean/v1.0.0/sounds/i_turned_myself_into_a_pickle.mp3"
+    },
+    {
+      "gainDB" : 5.5776371087687195,
+      "id" : "hey_morty",
+      "input" : {
+        "channels" : 2,
+        "durationSeconds" : 1.9683219954648525,
+        "frames" : 86803,
+        "fullScaleSamples" : 0,
+        "rmsDBFS" : -25.57763710876872,
+        "samplePeakDBFS" : -8.606042456656269,
+        "sampleRate" : 44100
+      },
+      "originalFile" : "assets/sounds/rick/hey_morty.mp3",
+      "originalSHA256" : "2ee49b58f94d9b123097174c05f073f1e7b98bb298a9398333e4c1e6a76b6243",
+      "output" : {
+        "channels" : 2,
+        "durationSeconds" : 1.9683219954648525,
+        "frames" : 86803,
+        "fullScaleSamples" : 0,
+        "rmsDBFS" : -19.999996185523596,
+        "samplePeakDBFS" : -3.0284907621853896,
+        "sampleRate" : 44100
+      },
+      "outputFile" : "assets/sounds/rick/normalized/hey_morty.wav",
+      "outputSHA256" : "d4064088cb9aa036de7fd9d4d63c6c5951a7893ce582829685ab5cc117444afd",
+      "peakLimited" : false,
+      "sourceCommit" : "125e30394baa24b70958e69ac7d87a6f5f401428",
+      "sourceURL" : "https://raw.githubusercontent.com/Mr3zee/peonping-rick-and-morty-clean/v1.0.0/sounds/hey_morty.mp3"
+    },
+    {
+      "gainDB" : -5.172369331924841,
+      "id" : "Rick_Sanchez_Jerry_.mp3",
+      "input" : {
+        "channels" : 2,
+        "durationSeconds" : 1.4541496598639456,
+        "frames" : 64128,
+        "fullScaleSamples" : 0,
+        "rmsDBFS" : -14.827630668075159,
+        "samplePeakDBFS" : -0.10399832461487638,
+        "sampleRate" : 44100
+      },
+      "originalFile" : "assets/sounds/rick/Rick_Sanchez_Jerry_.mp3",
+      "originalSHA256" : "c411813c72ff3a2d1b89ff8cdc74730e33902342d2f27625b7a27ec889b23259",
+      "output" : {
+        "channels" : 2,
+        "durationSeconds" : 1.4541496598639456,
+        "frames" : 64128,
+        "fullScaleSamples" : 0,
+        "rmsDBFS" : -19.99999636413743,
+        "samplePeakDBFS" : -5.276234290230119,
+        "sampleRate" : 44100
+      },
+      "outputFile" : "assets/sounds/rick/normalized/Rick_Sanchez_Jerry_.wav",
+      "outputSHA256" : "707ff3cb04ec7e6a093aaf3e930bccadb816ea423e2f42d83d165996acb8d42e",
+      "peakLimited" : false,
+      "sourceCommit" : "ec8630d43ae2cdb2af2617aa69a3df7737ec1c6d",
+      "sourceURL" : "https://raw.githubusercontent.com/PeonPing/og-packs/v1.0.0/rick/sounds/Rick_Sanchez_Jerry_.mp3"
+    },
+    {
+      "gainDB" : -4.8597975102384865,
+      "id" : "Rick_Sanchez_Anything_Else_.mp3",
+      "input" : {
+        "channels" : 2,
+        "durationSeconds" : 1.195827664399093,
+        "frames" : 52736,
+        "fullScaleSamples" : 0,
+        "rmsDBFS" : -15.140202489761514,
+        "samplePeakDBFS" : -0.21604800331370705,
+        "sampleRate" : 44100
+      },
+      "originalFile" : "assets/sounds/rick/Rick_Sanchez_Anything_Else_.mp3",
+      "originalSHA256" : "5240bfcc85c103688d11e8966abfb2aff2f548b1bf88dcc3bee1783b3e678bd0",
+      "output" : {
+        "channels" : 2,
+        "durationSeconds" : 1.195827664399093,
+        "frames" : 52736,
+        "fullScaleSamples" : 0,
+        "rmsDBFS" : -19.99999914794954,
+        "samplePeakDBFS" : -5.075654123710658,
+        "sampleRate" : 44100
+      },
+      "outputFile" : "assets/sounds/rick/normalized/Rick_Sanchez_Anything_Else_.wav",
+      "outputSHA256" : "40a7a28fea7eb61bde6906658918f1653321a32a0c6e53c4e2bac21b36dea971",
+      "peakLimited" : false,
+      "sourceCommit" : "ec8630d43ae2cdb2af2617aa69a3df7737ec1c6d",
+      "sourceURL" : "https://raw.githubusercontent.com/PeonPing/og-packs/v1.0.0/rick/sounds/Rick_Sanchez_Anything_Else_.mp3"
+    },
+    {
+      "gainDB" : -7.239475556768438,
+      "id" : "Rick_Sanchez_Seriously_.mp3",
+      "input" : {
+        "channels" : 2,
+        "durationSeconds" : 1.172607709750567,
+        "frames" : 51712,
+        "fullScaleSamples" : 0,
+        "rmsDBFS" : -12.760524443231562,
+        "samplePeakDBFS" : -0.03798829226761104,
+        "sampleRate" : 44100
+      },
+      "originalFile" : "assets/sounds/rick/Rick_Sanchez_Seriously_.mp3",
+      "originalSHA256" : "f9cc19192fc78fdfa2dc3452e1f10b3ef0cbd7664b10787473c4a24394dfd658",
+      "output" : {
+        "channels" : 2,
+        "durationSeconds" : 1.172607709750567,
+        "frames" : 51712,
+        "fullScaleSamples" : 0,
+        "rmsDBFS" : -20.000001153260133,
+        "samplePeakDBFS" : -7.277311911996423,
+        "sampleRate" : 44100
+      },
+      "outputFile" : "assets/sounds/rick/normalized/Rick_Sanchez_Seriously_.wav",
+      "outputSHA256" : "68d4cb0615a18d4fabcb4d4f8e230388b07c118c809363fce863cece931ce0f3",
+      "peakLimited" : false,
+      "sourceCommit" : "ec8630d43ae2cdb2af2617aa69a3df7737ec1c6d",
+      "sourceURL" : "https://raw.githubusercontent.com/PeonPing/og-packs/v1.0.0/rick/sounds/Rick_Sanchez_Seriously_.mp3"
+    },
+    {
+      "gainDB" : -7.149838737203961,
+      "id" : "Rick_Sanchez_Fun.mp3",
+      "input" : {
+        "channels" : 2,
+        "durationSeconds" : 0.7894784580498866,
+        "frames" : 34816,
+        "fullScaleSamples" : 0,
+        "rmsDBFS" : -12.850161262796039,
+        "samplePeakDBFS" : -0.0260160096856107,
+        "sampleRate" : 44100
+      },
+      "originalFile" : "assets/sounds/rick/Rick_Sanchez_Fun.mp3",
+      "originalSHA256" : "631d491ca7ab419e2ce66af5accfe89b7cd22b6dd6ef6ff4ca5053abc16d523b",
+      "output" : {
+        "channels" : 2,
+        "durationSeconds" : 0.7894784580498866,
+        "frames" : 34816,
+        "fullScaleSamples" : 0,
+        "rmsDBFS" : -19.99999862205183,
+        "samplePeakDBFS" : -7.17559316811183,
+        "sampleRate" : 44100
+      },
+      "outputFile" : "assets/sounds/rick/normalized/Rick_Sanchez_Fun.wav",
+      "outputSHA256" : "09c70edd2e4a66ca6608ff67cc3da2270b09ebafe78b4e66da67d0fce9147fed",
+      "peakLimited" : false,
+      "sourceCommit" : "ec8630d43ae2cdb2af2617aa69a3df7737ec1c6d",
+      "sourceURL" : "https://raw.githubusercontent.com/PeonPing/og-packs/v1.0.0/rick/sounds/Rick_Sanchez_Fun.mp3"
+    },
+    {
+      "gainDB" : -4.192784240721643,
+      "id" : "Rick_Sanchez_Page.mp3",
+      "input" : {
+        "channels" : 2,
+        "durationSeconds" : 1.787936507936508,
+        "frames" : 78848,
+        "fullScaleSamples" : 0,
+        "rmsDBFS" : -15.807215759278357,
+        "samplePeakDBFS" : -0.00026507636037961915,
+        "sampleRate" : 44100
+      },
+      "originalFile" : "assets/sounds/rick/Rick_Sanchez_Page.mp3",
+      "originalSHA256" : "752520717e9c24999fe72d2ba2153ed180c55d1e4066daa1f76be47a0c5b7242",
+      "output" : {
+        "channels" : 2,
+        "durationSeconds" : 1.787936507936508,
+        "frames" : 78848,
+        "fullScaleSamples" : 0,
+        "rmsDBFS" : -19.999999815381443,
+        "samplePeakDBFS" : -4.1929461154962695,
+        "sampleRate" : 44100
+      },
+      "outputFile" : "assets/sounds/rick/normalized/Rick_Sanchez_Page.wav",
+      "outputSHA256" : "7529f49a20a64fa31402f8b6631bbdbe1329b2eb69ba0a3890d37a733e97559b",
+      "peakLimited" : false,
+      "sourceCommit" : "ec8630d43ae2cdb2af2617aa69a3df7737ec1c6d",
+      "sourceURL" : "https://raw.githubusercontent.com/PeonPing/og-packs/v1.0.0/rick/sounds/Rick_Sanchez_Page.mp3"
+    },
+    {
+      "gainDB" : -3.0097349236396203,
+      "id" : "Rick_Sanchez_What_.mp3",
+      "input" : {
+        "channels" : 2,
+        "durationSeconds" : 0.5805,
+        "frames" : 27864,
+        "fullScaleSamples" : 0,
+        "rmsDBFS" : -17.96174810167894,
+        "samplePeakDBFS" : -0.00026507636037961915,
+        "sampleRate" : 48000
+      },
+      "originalFile" : "assets/sounds/rick/Rick_Sanchez_What_.mp3",
+      "originalSHA256" : "66e28126e925dec00c7ba037fa94de5e9677c44c8d17c828db63c6dc7480302f",
+      "output" : {
+        "channels" : 2,
+        "durationSeconds" : 0.5805,
+        "frames" : 27864,
+        "fullScaleSamples" : 0,
+        "rmsDBFS" : -20.971484164745235,
+        "samplePeakDBFS" : -3.010103154935409,
+        "sampleRate" : 48000
+      },
+      "outputFile" : "assets/sounds/rick/normalized/Rick_Sanchez_What_.wav",
+      "outputSHA256" : "502fbef209774213599dbbb66fab7ed99dfc564406e2e7d7d0c5ee602783e434",
+      "peakLimited" : true,
+      "sourceCommit" : "ec8630d43ae2cdb2af2617aa69a3df7737ec1c6d",
+      "sourceURL" : "https://raw.githubusercontent.com/PeonPing/og-packs/v1.0.0/rick/sounds/Rick_Sanchez_What_.mp3"
+    },
+    {
+      "gainDB" : -7.1654240315788424,
+      "id" : "Rick_Sanchez_Whatever.mp3",
+      "input" : {
+        "channels" : 2,
+        "durationSeconds" : 0.5340589569160997,
+        "frames" : 23552,
+        "fullScaleSamples" : 0,
+        "rmsDBFS" : -12.834575968421158,
+        "samplePeakDBFS" : -0.09756234558272792,
+        "sampleRate" : 44100
+      },
+      "originalFile" : "assets/sounds/rick/Rick_Sanchez_Whatever.mp3",
+      "originalSHA256" : "469cac8421fd73b29d22895f256cf710e12b7604a954e41b72ece812b0fe5d1a",
+      "output" : {
+        "channels" : 2,
+        "durationSeconds" : 0.5340589569160997,
+        "frames" : 23552,
+        "fullScaleSamples" : 0,
+        "rmsDBFS" : -20.000008082459978,
+        "samplePeakDBFS" : -7.263231811533228,
+        "sampleRate" : 44100
+      },
+      "outputFile" : "assets/sounds/rick/normalized/Rick_Sanchez_Whatever.wav",
+      "outputSHA256" : "62db3437b6a92441da6fd3fb6964d2850530f0d2457a6ec63e90b23921288b96",
+      "peakLimited" : false,
+      "sourceCommit" : "ec8630d43ae2cdb2af2617aa69a3df7737ec1c6d",
+      "sourceURL" : "https://raw.githubusercontent.com/PeonPing/og-packs/v1.0.0/rick/sounds/Rick_Sanchez_Whatever.mp3"
+    },
+    {
+      "gainDB" : -2.941607862553854,
+      "id" : "Rick_Sanchez_Drink_.mp3",
+      "input" : {
+        "channels" : 2,
+        "durationSeconds" : 0.9926666666666667,
+        "frames" : 47648,
+        "fullScaleSamples" : 0,
+        "rmsDBFS" : -19.11737285541734,
+        "samplePeakDBFS" : -0.0683921374461457,
+        "sampleRate" : 48000
+      },
+      "originalFile" : "assets/sounds/rick/Rick_Sanchez_Drink_.mp3",
+      "originalSHA256" : "c3b27432a98915e42900f8c53009949ab47b5f8f9f09493028bb137fb524818c",
+      "output" : {
+        "channels" : 2,
+        "durationSeconds" : 0.9926666666666667,
+        "frames" : 47648,
+        "fullScaleSamples" : 0,
+        "rmsDBFS" : -22.058985499638226,
+        "samplePeakDBFS" : -3.010103154935409,
+        "sampleRate" : 48000
+      },
+      "outputFile" : "assets/sounds/rick/normalized/Rick_Sanchez_Drink_.wav",
+      "outputSHA256" : "8b848cc5ff7243b59ccc5b2fa5e8b520deeba6b361eeb96a4e498ec795cf5480",
+      "peakLimited" : true,
+      "sourceCommit" : "ec8630d43ae2cdb2af2617aa69a3df7737ec1c6d",
+      "sourceURL" : "https://raw.githubusercontent.com/PeonPing/og-packs/v1.0.0/rick/sounds/Rick_Sanchez_Drink_.mp3"
+    },
+    {
+      "gainDB" : -8.20090615941201,
+      "id" : "Rick_Sanchez_Point.mp3",
+      "input" : {
+        "channels" : 2,
+        "durationSeconds" : 1.1087528344671203,
+        "frames" : 48896,
+        "fullScaleSamples" : 0,
+        "rmsDBFS" : -11.79909384058799,
+        "samplePeakDBFS" : -0.00026507636037961915,
+        "sampleRate" : 44100
+      },
+      "originalFile" : "assets/sounds/rick/Rick_Sanchez_Point.mp3",
+      "originalSHA256" : "fba6b062ada17862095f65479b4ef1dbd63c280b1a79548253d4488ebdb18938",
+      "output" : {
+        "channels" : 2,
+        "durationSeconds" : 1.1087528344671203,
+        "frames" : 48896,
+        "fullScaleSamples" : 0,
+        "rmsDBFS" : -19.999999719339275,
+        "samplePeakDBFS" : -8.200838983010822,
+        "sampleRate" : 44100
+      },
+      "outputFile" : "assets/sounds/rick/normalized/Rick_Sanchez_Point.wav",
+      "outputSHA256" : "82f633dac771d2bf10ec914d15f47ad0fe255a31c880e6911d0bd9dc67f6ce5b",
+      "peakLimited" : false,
+      "sourceCommit" : "ec8630d43ae2cdb2af2617aa69a3df7737ec1c6d",
+      "sourceURL" : "https://raw.githubusercontent.com/PeonPing/og-packs/v1.0.0/rick/sounds/Rick_Sanchez_Point.mp3"
+    },
+    {
+      "gainDB" : -6.523360474892577,
+      "id" : "Rick_Sanchez_Whiskey_.mp3",
+      "input" : {
+        "channels" : 2,
+        "durationSeconds" : 2.2799092970521544,
+        "frames" : 100544,
+        "fullScaleSamples" : 0,
+        "rmsDBFS" : -13.476639525107423,
+        "samplePeakDBFS" : -0.026281881206103606,
+        "sampleRate" : 44100
+      },
+      "originalFile" : "assets/sounds/rick/Rick_Sanchez_Whiskey_.mp3",
+      "originalSHA256" : "1e214f5147e1e726aa0447681df2f832fa99a14a98e19fd9de33cad69bd01cfd",
+      "output" : {
+        "channels" : 2,
+        "durationSeconds" : 2.2799092970521544,
+        "frames" : 100544,
+        "fullScaleSamples" : 0,
+        "rmsDBFS" : -19.99999990962204,
+        "samplePeakDBFS" : -6.549564666246428,
+        "sampleRate" : 44100
+      },
+      "outputFile" : "assets/sounds/rick/normalized/Rick_Sanchez_Whiskey_.wav",
+      "outputSHA256" : "b61d8d53618f678ef3d095134dd62c38eebd2669b5bb0869fb81dbe5b467e6a5",
+      "peakLimited" : false,
+      "sourceCommit" : "ec8630d43ae2cdb2af2617aa69a3df7737ec1c6d",
+      "sourceURL" : "https://raw.githubusercontent.com/PeonPing/og-packs/v1.0.0/rick/sounds/Rick_Sanchez_Whiskey_.mp3"
+    },
+    {
+      "gainDB" : -7.766776139175702,
+      "id" : "Rick_Sanchez_Later.mp3",
+      "input" : {
+        "channels" : 2,
+        "durationSeconds" : 1.2829024943310658,
+        "frames" : 56576,
+        "fullScaleSamples" : 0,
+        "rmsDBFS" : -12.233223860824298,
+        "samplePeakDBFS" : -0.033995697557887825,
+        "sampleRate" : 44100
+      },
+      "originalFile" : "assets/sounds/rick/Rick_Sanchez_Later.mp3",
+      "originalSHA256" : "1090f88a121773aef38070bffb7e713df5f131a45771ad4700c71f2615160437",
+      "output" : {
+        "channels" : 2,
+        "durationSeconds" : 1.2829024943310658,
+        "frames" : 56576,
+        "fullScaleSamples" : 0,
+        "rmsDBFS" : -20.000000145235962,
+        "samplePeakDBFS" : -7.800674739539256,
+        "sampleRate" : 44100
+      },
+      "outputFile" : "assets/sounds/rick/normalized/Rick_Sanchez_Later.wav",
+      "outputSHA256" : "66364c4e5788e2971f215c0789bfc3f677097a5dbbcb9e8a23f80b53621bb828",
+      "peakLimited" : false,
+      "sourceCommit" : "ec8630d43ae2cdb2af2617aa69a3df7737ec1c6d",
+      "sourceURL" : "https://raw.githubusercontent.com/PeonPing/og-packs/v1.0.0/rick/sounds/Rick_Sanchez_Later.mp3"
+    },
+    {
+      "gainDB" : -4.7317177992752395,
+      "id" : "Rick_Sanchez_Children.mp3",
+      "input" : {
+        "channels" : 2,
+        "durationSeconds" : 1.5816041666666667,
+        "frames" : 75917,
+        "fullScaleSamples" : 0,
+        "rmsDBFS" : -15.26828220072476,
+        "samplePeakDBFS" : -0.02362353215001472,
+        "sampleRate" : 48000
+      },
+      "originalFile" : "assets/sounds/rick/Rick_Sanchez_Children.mp3",
+      "originalSHA256" : "89cb7583b7abe2576c8d2e93eb6d38c72ac8ccea3ef6d89c402f113ed2ed9053",
+      "output" : {
+        "channels" : 2,
+        "durationSeconds" : 1.5816041666666667,
+        "frames" : 75917,
+        "fullScaleSamples" : 0,
+        "rmsDBFS" : -20.00000037488626,
+        "samplePeakDBFS" : -4.755439447069288,
+        "sampleRate" : 48000
+      },
+      "outputFile" : "assets/sounds/rick/normalized/Rick_Sanchez_Children.wav",
+      "outputSHA256" : "e2e50b75056d8d875c1c1ed9a90660899f6d750cecd1cf2b363172828db09709",
+      "peakLimited" : false,
+      "sourceCommit" : "ec8630d43ae2cdb2af2617aa69a3df7737ec1c6d",
+      "sourceURL" : "https://raw.githubusercontent.com/PeonPing/og-packs/v1.0.0/rick/sounds/Rick_Sanchez_Children.mp3"
+    },
+    {
+      "gainDB" : -7.0110338769259215,
+      "id" : "Rick_Sanchez_Devil_.mp3",
+      "input" : {
+        "channels" : 2,
+        "durationSeconds" : 1.526734693877551,
+        "frames" : 67329,
+        "fullScaleSamples" : 0,
+        "rmsDBFS" : -12.988966123074078,
+        "samplePeakDBFS" : -0.02787728125431611,
+        "sampleRate" : 44100
+      },
+      "originalFile" : "assets/sounds/rick/Rick_Sanchez_Devil_.mp3",
+      "originalSHA256" : "fcf984ba5e78f73890e1c9462de708f65ebb406cb06b3df7b344eb18857fc1f5",
+      "output" : {
+        "channels" : 2,
+        "durationSeconds" : 1.526734693877551,
+        "frames" : 67329,
+        "fullScaleSamples" : 0,
+        "rmsDBFS" : -20.00000148496362,
+        "samplePeakDBFS" : -7.0386154477967935,
+        "sampleRate" : 44100
+      },
+      "outputFile" : "assets/sounds/rick/normalized/Rick_Sanchez_Devil_.wav",
+      "outputSHA256" : "c7d4577c74b2de9fdbf49920900cf6dd3e5dc94a85e0afa447d0136727f395c5",
+      "peakLimited" : false,
+      "sourceCommit" : "ec8630d43ae2cdb2af2617aa69a3df7737ec1c6d",
+      "sourceURL" : "https://raw.githubusercontent.com/PeonPing/og-packs/v1.0.0/rick/sounds/Rick_Sanchez_Devil_.mp3"
+    },
+    {
+      "gainDB" : -5.9721900064813465,
+      "id" : "Rick_Sanchez_Tax.mp3",
+      "input" : {
+        "channels" : 2,
+        "durationSeconds" : 2.064263038548753,
+        "frames" : 91034,
+        "fullScaleSamples" : 0,
+        "rmsDBFS" : -14.027809993518654,
+        "samplePeakDBFS" : -0.00026507636037961915,
+        "sampleRate" : 44100
+      },
+      "originalFile" : "assets/sounds/rick/Rick_Sanchez_Tax.mp3",
+      "originalSHA256" : "4e4b17affb099f9a947ca415cd9443b761e286bbdafc0f39525b9dd11078e06c",
+      "output" : {
+        "channels" : 2,
+        "durationSeconds" : 2.064263038548753,
+        "frames" : 91034,
+        "fullScaleSamples" : 0,
+        "rmsDBFS" : -20.000003552304126,
+        "samplePeakDBFS" : -5.972490233873408,
+        "sampleRate" : 44100
+      },
+      "outputFile" : "assets/sounds/rick/normalized/Rick_Sanchez_Tax.wav",
+      "outputSHA256" : "f1a8b48dac8b7affdaa9880279713459d96ba2daf0d9b616e799a267353b1424",
+      "peakLimited" : false,
+      "sourceCommit" : "ec8630d43ae2cdb2af2617aa69a3df7737ec1c6d",
+      "sourceURL" : "https://raw.githubusercontent.com/PeonPing/og-packs/v1.0.0/rick/sounds/Rick_Sanchez_Tax.mp3"
+    }
+  ],
+  "method" : "One constant gain per clip, measured over all decoded samples and channels. No trimming, compression, denoising, or playback.",
+  "minimumSamplePeakHeadroomDB" : 3,
+  "outputFormat" : "16-bit signed little-endian PCM WAV; original sample rate and channel count",
+  "samplePeakCeilingDBFS" : -3.01,
+  "schemaVersion" : 1,
+  "script" : "scripts/prepare_rick_voice.swift",
+  "sources" : {
+    "Mr3zee/peonping-rick-and-morty-clean@v1.0.0" : "125e30394baa24b70958e69ac7d87a6f5f401428",
+    "PeonPing/og-packs@v1.0.0" : "ec8630d43ae2cdb2af2617aa69a3df7737ec1c6d"
+  },
+  "targetRMSDBFS" : -20,
+  "validation" : "Outputs were decoded again and checked for preserved frame count, duration, rate and channels; RMS within 0.02 dB of expected gain; sample peaks at or below -3 dBFS; no full-scale samples. This is objective level balancing, not a listening test or perceptual LUFS normalization."
+}
