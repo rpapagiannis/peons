@@ -46,9 +46,11 @@ shasum -a 256 -c Peons-*.dmg.sha256
 
 Tiny is the only size (135.68 × 180.2 screen points for the transparent canvas). Older saved character and size choices automatically migrate to Rat Suit Rick at Tiny size.
 
-Open **Peons.app** in your Applications folder. Click Rick to play; click another app or press Escape to return to roaming. The pickle icon in the menu bar opens the menu. The controls window shows Rick and the voice controls, with no character or size selector.
+Open **Peons.app** in your Applications folder. Click Rick to play; click another app or press Escape to return to roaming. The pickle icon in the menu bar opens the menu. The controls window shows Rick and the sound controls, with no character or size selector.
 
 In free roam, Rick mixes walking and resting with occasional high jumps and rarer portal trips to a different spot, including other connected monitors. He waits between actions and lets throws and landings finish first. Hover over him to keep him easy to catch; autonomous actions pause while you interact with him, open his menu, or put him down for a nap. Voices continue to follow the existing occasional-chatter setting.
+
+Each portal trip opens with the recorded Rick and Morty portal sound, including P, the menu, summoning, and free roam. It shares the voices' mute and volume controls and replaces any current recording. Portal effects do not advance the voice-line cycle or show a speech bubble. Turning off occasional chatter keeps portal effects enabled; muting, hiding Rick, or putting him down for a nap silences both voices and effects.
 
 | Control | Action |
 | --- | --- |
@@ -60,9 +62,9 @@ In free roam, Rick mixes walking and resting with occasional high jumps and rare
 | Drag and release | Pick up and throw with momentum |
 | P | Portal to another spot, including another monitor |
 | E | Play the next voice line |
-| M | Mute or unmute voices |
+| M | Mute or unmute all sound |
 | Escape | Release keyboard control and roam |
-| Right-click Rick | Controls, speed, nap, voices, hide, summon, quit |
+| Right-click Rick | Controls, speed, nap, sound, hide, summon, quit |
 | C or H while controlling | Open Rick controls |
 
 All connected monitors form one desktop. Rick walks, jumps, or flies across internal monitor seams without bouncing or wrapping. Wrapping happens only beyond the far left and right edges of the combined desktop. Ground travel follows each monitor's usable bottom edge, stepping to the receiving floor when the monitors have different vertical offsets. The screen bottom is the only platform; application windows and boxes are not detected. Disconnecting a monitor brings Rick back onto a remaining screen.
@@ -81,11 +83,13 @@ Requires Apple's Command Line Tools:
 open "build/Peons.app"
 ```
 
-Builds produce a fresh `build/Peons.app` containing only Rick's atlas and voice assets, with a Rick app icon generated from that atlas. Build and test compiler caches are temporary and removed when each command exits. Retired characters, rolling animations, prototype renderers, and their assets have been removed from the source tree. Rebuilding does not install the bundle into Applications: replace the installed copy and restart it to use an updated build.
+For an additional real-player check on a Mac with audio output, run `./test.sh --audio-playback`. Playback uses zero volume. The default suite validates the audio files and controller behavior without requiring an output device.
+
+Builds produce a fresh `build/Peons.app` containing Rick's atlas, 17 voice recordings, and the portal effect, with a Rick app icon generated from that atlas. Only manifest-referenced, normalized audio is bundled. Build and test compiler caches are temporary and removed when each command exits. Retired characters, rolling animations, prototype renderers, and their assets have been removed from the source tree. Rebuilding does not install the bundle into Applications: replace the installed copy and restart it to use an updated build.
 
 To package locally, run `./scripts/package_release.sh` after building; it writes `dist/Peons-<version>-<build>-arm64-preview.dmg` and its SHA-256 checksum. After a merge or push to `main` passes CI, GitHub Actions increments the build number, moves the unreleased changelog entries into that release, and builds and tests the versioned app. It then commits the release metadata, pushes the matching tag, publishes the DMG and checksum, and updates the Homebrew cask. Add changes under `## Unreleased` in `CHANGELOG.md`; edit the app version in `build.sh` only when a new major, minor, or patch version is wanted. Manual tag releases, dry runs, and cask repair remain available. See [distribution/README.md](distribution/README.md). Preview builds are ad-hoc signed; Developer ID signing and notarization are still to do, and the redistribution basis for the bundled artwork and recordings is recorded in [assets/ATTRIBUTION.md](assets/ATTRIBUTION.md).
 
-`Sources/Characters.swift` defines the supported catalog and voice pack. `PetModel.swift` owns shared physics, the fixed desktop size, and monitor geometry. `SpriteRenderer.swift` draws the artwork and effects. `App.swift` provides the native panel, controls, and migration of old preferences.
+`Sources/Characters.swift` defines the supported catalog and voice pack. `SoundPlayer.swift` provides the single audio channel shared by dialogue and effects. `PetModel.swift` owns shared physics, the fixed desktop size, monitor geometry, and accepted portal openings. `SpriteRenderer.swift` draws the artwork and effects. `App.swift` provides the native panel, controls, and migration of old preferences.
 
 Development exports:
 
@@ -96,16 +100,16 @@ Development exports:
 
 `--diagnostics /absolute/path.json` writes only this app's internal state and display geometry. It is disabled in normal launches. The legacy bundle identifier `local.rafail.pickle-rick-pet` and migration of saved character/size choices are retained for compatibility with earlier installations.
 
-The Rick voice selection and comparison are documented in `research/VOICE_PACKS.md`. To reproduce the balanced voice files from the pinned original recordings, run `swift scripts/prepare_rick_voice.swift`, then rebuild. This preparation step uses macOS audio decoding services and does not play audio.
+The Rick voice selection and comparison are documented in `research/VOICE_PACKS.md`; the portal source and playback behavior are in `research/PORTAL_SOUND.md`. To reproduce all balanced sound files from the pinned original recordings, run `swift scripts/prepare_audio.swift`, then rebuild. This preparation step uses macOS audio decoding services and does not play audio.
 
-Artwork and voice provenance are in `assets/ATTRIBUTION.md`. This is an unofficial personal project; the character artwork belongs to its respective rights holders. The original atlas is bundled unmodified and existing poses are selected at runtime. Recorded voice clips play locally with matching speech bubbles.
+Artwork and sound provenance are in `assets/ATTRIBUTION.md`. This is an unofficial personal project; the character artwork belongs to its respective rights holders. The original atlas is bundled unmodified and existing poses are selected at runtime. Recorded voice clips play locally with matching speech bubbles.
 
 ## Project layout
 
 - `Sources/` and `Tests/`: the current Rick app and its regression coverage.
-- `assets/`: the active sprite atlas, 17 normalized recordings, original recordings, and attribution.
-- `research/`: movement rationale and the pinned Rick voice selection/provenance needed to reproduce the assets.
-- `scripts/` and `distribution/`: voice preparation, DMG packaging, the Homebrew cask template, and the release process notes.
+- `assets/`: the active sprite atlas, 17 normalized voices, the normalized portal effect, original recordings, and attribution.
+- `research/`: movement rationale and the pinned sound selection/provenance needed to reproduce the assets.
+- `scripts/` and `distribution/`: audio preparation, DMG packaging, the Homebrew cask template, and the release process notes.
 - `CHANGELOG.md`: what changed in each release; the release workflow copies the matching section into the GitHub release notes.
 - `docs/`: the demo animation shown above, exported with `--export-demo`.
 - `.github/workflows/`: CI for pushes to `main` and pull requests; successful `main` builds call the reusable release workflow to version, publish, and update Homebrew. Manual tags and dry runs use the same release workflow.

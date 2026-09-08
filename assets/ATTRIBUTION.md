@@ -19,6 +19,14 @@ The original recordings and their pinned upstream checksums remain in the source
 
 The comparison of the four available Rick-related packs is documented in `research/VOICE_PACKS.md` in the project source.
 
+## Recorded portal effect
+
+`sounds/effects/normalized/portal_open.wav` is derived from the [Rick and Morty portal sound](https://soundboardguy.com/sounds/rick-and-morty-portal-sound/) uploaded to SoundboardGuy by **zarak.khan81**, retrieved 2026-09-08. [Original MP3](https://soundboardguy.com/wp-content/uploads/2022/12/portal-gun-sound-effect.mp3).
+
+The original MP3 and its SHA-256 remain in the source tree, with provenance in `research/portal-audio-provenance.json`. The effect uses the same preparation function as the voices: one constant gain toward −20 dBFS RMS, with at least 3 dB sample-peak headroom. Duration, sample rate, channels, and frame count are preserved. `sounds/effects/normalization.json` records the input/output checksums and measurements. `sounds/effects/effects.json` is its playback inventory.
+
+The source page offers a download but states no redistribution license for this fan-uploaded recording. No ownership or license to the underlying Rick and Morty audio is claimed; its rights remain with their respective owners. This effect is not covered by the voice packs' CC-BY-NC-4.0 declarations.
+
 ## Redistribution basis for this source repository
 
 Checked 2026-09-08. Peons is a free, non-commercial personal project and credits both upstream sources above.

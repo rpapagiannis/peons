@@ -29,24 +29,25 @@ cat > "$app/Contents/Info.plist" <<'PLIST'
 PLIST
 cp assets/rat-suit-pickle-rick-atlas.png "$app/Contents/Resources/"
 cp assets/ATTRIBUTION.md "$app/Contents/Resources/"
-# Copy only the active pack's referenced clips; original recordings stay in the source tree.
+# Copy only manifest-referenced voices/effects; original recordings stay in the source tree.
 python3 - "$app/Contents/Resources" <<'PYASSETS'
 from pathlib import Path, PurePosixPath
 import json, shutil, sys
 source = Path("assets/sounds")
 destination = Path(sys.argv[1]) / "sounds"
-pack = source / "rick"
-for metadata in pack.glob("*.json"):
-    target = destination / "rick" / metadata.name
-    target.parent.mkdir(parents=True, exist_ok=True)
-    shutil.copy2(metadata, target)
-for line in json.loads((pack / "lines.json").read_text()):
-    relative = PurePosixPath(line["audioAsset"])
-    if relative.is_absolute() or ".." in relative.parts or relative.parts[0] != "rick":
-        raise ValueError(f"Unexpected voice asset: {relative}")
-    target = destination / str(relative)
-    target.parent.mkdir(parents=True, exist_ok=True)
-    shutil.copy2(source / str(relative), target)
+for directory, manifest in [("rick", "lines.json"), ("effects", "effects.json")]:
+    pack = source / directory
+    for metadata in pack.glob("*.json"):
+        target = destination / directory / metadata.name
+        target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(metadata, target)
+    for clip in json.loads((pack / manifest).read_text()):
+        relative = PurePosixPath(clip["audioAsset"])
+        if relative.is_absolute() or ".." in relative.parts or relative.parts[0] != directory:
+            raise ValueError(f"Unexpected sound asset: {relative}")
+        target = destination / str(relative)
+        target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(source / str(relative), target)
 PYASSETS
 # Render Rick from the bundled atlas so the app icon stays reproducible from source.
 icon_png="$staging/Peons.png"

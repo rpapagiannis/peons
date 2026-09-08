@@ -1,5 +1,5 @@
 #!/usr/bin/env swift
-// Run from any directory: swift scripts/prepare_rick_voice.swift
+// Run from any directory: swift scripts/prepare_audio.swift
 // Uses only macOS frameworks. Decodes local files without playing audio or fetching data.
 import Foundation
 import AVFoundation
@@ -32,7 +32,7 @@ struct Derivation: Codable {
     let originalFile: String
     let originalSHA256: String
     let sourceURL: String
-    let sourceCommit: String
+    let sourceCommit: String?
     let outputFile: String
     let outputSHA256: String
     let gainDB: Double
@@ -44,7 +44,7 @@ struct Derivation: Codable {
 struct Normalization: Encodable {
     let schemaVersion = 1
     let method = "One constant gain per clip, measured over all decoded samples and channels. No trimming, compression, denoising, or playback."
-    let script = "scripts/prepare_rick_voice.swift"
+    let script = "scripts/prepare_audio.swift"
     let outputFormat = "16-bit signed little-endian PCM WAV; original sample rate and channel count"
     let targetRMSDBFS: Double
     let samplePeakCeilingDBFS: Double
@@ -123,6 +123,37 @@ func encode<T: Encodable>(_ value: T, to url: URL) throws {
     try data.write(to: url, options: .atomic)
 }
 
+let targetRMS = -20.0
+// 0.01 dB extra margin keeps 16-bit rounding safely below the 3 dB headroom requirement.
+let peakCeiling = -3.01
+
+// The same offline preparation policy applies to dialogue and sound effects.
+func normalize(_ provenance: UpstreamClip, id: String, root: URL,
+               outputFile: String, sourceCommit: String? = nil) throws -> Derivation {
+    let inputURL = root.appendingPathComponent(provenance.file)
+    try require(try sha256(inputURL) == provenance.sha256, "Original checksum mismatch: \(provenance.file)")
+    let buffer = try decode(inputURL)
+    let before = try levels(buffer)
+    let desiredGain = targetRMS - before.rmsDBFS
+    let gain = min(desiredGain, peakCeiling - before.samplePeakDBFS)
+    let multiplier = Float(pow(10, gain / 20))
+    for channel in 0..<Int(buffer.format.channelCount) {
+        for frame in 0..<Int(buffer.frameLength) { buffer.floatChannelData![channel][frame] *= multiplier }
+    }
+    let outputURL = root.appendingPathComponent(outputFile)
+    try FileManager.default.createDirectory(at: outputURL.deletingLastPathComponent(), withIntermediateDirectories: true)
+    try writePCM(buffer, to: outputURL)
+    let after = try levels(decode(outputURL))
+    try require(after.frames == before.frames && after.sampleRate == before.sampleRate && after.channels == before.channels, "Output timing/format changed: \(id)")
+    try require(abs(after.rmsDBFS - (before.rmsDBFS + gain)) < 0.02, "Output RMS validation failed: \(id)")
+    try require(after.samplePeakDBFS <= -3 && after.fullScaleSamples == 0, "Output peak validation failed: \(id)")
+    print(String(format: "%@  RMS %.2f -> %.2f dBFS, peak %.2f dBFS, gain %+.2f dB%@", id, before.rmsDBFS, after.rmsDBFS, after.samplePeakDBFS, gain, gain < desiredGain ? " (peak-capped)" : ""))
+    return Derivation(id: id, originalFile: provenance.file, originalSHA256: provenance.sha256,
+                      sourceURL: provenance.source, sourceCommit: sourceCommit,
+                      outputFile: outputFile, outputSHA256: try sha256(outputURL),
+                      gainDB: gain, peakLimited: gain < desiredGain, input: before, output: after)
+}
+
 do {
     let root = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent()
     let pack = root.appendingPathComponent("assets/sounds/rick")
@@ -142,54 +173,45 @@ do {
     }
     lines = signatureLines + lines.filter { !signatureIDs.contains($0.id) }
 
-    let targetRMS = -20.0
-    // 0.01 dB extra margin keeps 16-bit rounding safely below the 3 dB headroom requirement.
-    let peakCeiling = -3.01
     let sources = [
         "PeonPing/og-packs@v1.0.0": "ec8630d43ae2cdb2af2617aa69a3df7737ec1c6d",
         "Mr3zee/peonping-rick-and-morty-clean@v1.0.0": "125e30394baa24b70958e69ac7d87a6f5f401428"
     ]
-    try FileManager.default.createDirectory(at: pack.appendingPathComponent("normalized"), withIntermediateDirectories: true)
     var derivations: [Derivation] = []
     for index in lines.indices {
         let id = lines[index].id
         let originalName = id.hasSuffix(".mp3") ? id : id + ".mp3"
         guard let provenance = originalByName[originalName] else { throw PreparationError.invalid("Missing provenance for \(id)") }
-        let inputURL = root.appendingPathComponent(provenance.file)
-        try require(try sha256(inputURL) == provenance.sha256, "Original checksum mismatch: \(originalName)")
-        let buffer = try decode(inputURL)
-        let before = try levels(buffer)
-        let desiredGain = targetRMS - before.rmsDBFS
-        let gain = min(desiredGain, peakCeiling - before.samplePeakDBFS)
-        let multiplier = Float(pow(10, gain / 20))
-        for channel in 0..<Int(buffer.format.channelCount) {
-            for frame in 0..<Int(buffer.frameLength) { buffer.floatChannelData![channel][frame] *= multiplier }
-        }
         let outputName = URL(fileURLWithPath: originalName).deletingPathExtension().lastPathComponent + ".wav"
         let relativeOutput = "normalized/" + outputName
-        let outputURL = pack.appendingPathComponent(relativeOutput)
-        try writePCM(buffer, to: outputURL)
-        let after = try levels(decode(outputURL))
-        try require(after.frames == before.frames && after.sampleRate == before.sampleRate && after.channels == before.channels, "Output timing/format changed: \(id)")
-        try require(abs(after.rmsDBFS - (before.rmsDBFS + gain)) < 0.02, "Output RMS validation failed: \(id)")
-        try require(after.samplePeakDBFS <= -3 && after.fullScaleSamples == 0, "Output peak validation failed: \(id)")
         lines[index].audioAsset = "rick/" + relativeOutput
         let upstream = provenance.source.contains("/PeonPing/") ? "PeonPing/og-packs@v1.0.0" : "Mr3zee/peonping-rick-and-morty-clean@v1.0.0"
-        derivations.append(Derivation(id: id, originalFile: provenance.file, originalSHA256: provenance.sha256,
-                                      sourceURL: provenance.source, sourceCommit: sources[upstream]!,
-                                      outputFile: "assets/sounds/rick/" + relativeOutput, outputSHA256: try sha256(outputURL),
-                                      gainDB: gain, peakLimited: gain < desiredGain, input: before, output: after))
-        print(String(format: "%@  RMS %.2f -> %.2f dBFS, peak %.2f dBFS, gain %+.2f dB%@", id, before.rmsDBFS, after.rmsDBFS, after.samplePeakDBFS, gain, gain < desiredGain ? " (peak-capped)" : ""))
+        derivations.append(try normalize(provenance, id: id, root: root,
+                                         outputFile: "assets/sounds/rick/" + relativeOutput,
+                                         sourceCommit: sources[upstream]!))
     }
     let normalization = Normalization(targetRMSDBFS: targetRMS, samplePeakCeilingDBFS: peakCeiling,
                                       minimumSamplePeakHeadroomDB: 3, sources: sources, clips: derivations)
     try encode(normalization, to: pack.appendingPathComponent("normalization.json"))
     try encode(lines, to: pack.appendingPathComponent("lines.json"))
 
+    struct Effect: Decodable { let id: String; let audioAsset: String }
+    let effectsPack = root.appendingPathComponent("assets/sounds/effects")
+    let effects = try JSONDecoder().decode([Effect].self, from: Data(contentsOf: effectsPack.appendingPathComponent("effects.json")))
+    let effectSources = try JSONDecoder().decode([UpstreamClip].self, from: Data(contentsOf: root.appendingPathComponent("research/portal-audio-provenance.json")))
+    try require(effects.count == 1 && effects[0].id == "portal-open" && effectSources.count == 1, "Expected the portal opening effect and its pinned source")
+    let portal = try normalize(effectSources[0], id: effects[0].id, root: root,
+                               outputFile: "assets/sounds/" + effects[0].audioAsset)
+    let effectNormalization = Normalization(targetRMSDBFS: targetRMS, samplePeakCeilingDBFS: peakCeiling,
+                                            minimumSamplePeakHeadroomDB: 3,
+                                            sources: ["SoundboardGuy": "https://soundboardguy.com/sounds/rick-and-morty-portal-sound/"],
+                                            clips: [portal])
+    try encode(effectNormalization, to: effectsPack.appendingPathComponent("normalization.json"))
+
     // openpeon.json stays the unmodified upstream 14-clip manifest, retained for provenance.
     // lines.json is the actual 17-clip playback inventory; normalization.json records its derivation.
-    print("Prepared and validated \(lines.count) normalized clips. Original MP3s were unchanged.")
+    print("Prepared and validated \(lines.count) voices and \(effects.count) effect. Original MP3s were unchanged.")
 } catch {
-    FileHandle.standardError.write(Data("Rick voice preparation failed: \(error)\n".utf8))
+    FileHandle.standardError.write(Data("Audio preparation failed: \(error)\n".utf8))
     exit(1)
 }
