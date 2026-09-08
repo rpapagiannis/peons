@@ -4,6 +4,8 @@ After CI passes on `main`, the release workflow advances the build number and mo
 
 ## Unreleased
 
+## 4.2.2 (build 12)
+
 - Give about one in three free-roam jumps a second boost near the top, and hold full directional movement at the selected speed throughout every autonomous jump.
 
 ## 4.2.2 (build 11)
