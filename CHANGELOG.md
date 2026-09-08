@@ -4,6 +4,8 @@ After CI passes on `main`, the release workflow advances the build number and mo
 
 ## Unreleased
 
+## 4.2.2 (build 11)
+
 - Play the recorded Rick and Morty portal effect once for each manual, summoned, or autonomous portal opening. Refused requests stay silent and portal actions preserve the voice-line cycle.
 - Share one audio player, mute/volume settings, lifecycle cleanup, and offline level balancing between voices and effects. Sound controls now describe both, and idle chatter waits for the portal recording to finish.
 - Bundle the manifest-selected normalized portal recording with source attribution and checksums; add portal sound regression coverage.
