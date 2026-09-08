@@ -46,6 +46,8 @@ jobs:
     runs-on: macos-15
     concurrency:
       group: peons-release
+      # Late CI completions and dry runs must not replace a pending release.
+      queue: max
       cancel-in-progress: false
     env:
       GH_TOKEN: ${{ github.token }}

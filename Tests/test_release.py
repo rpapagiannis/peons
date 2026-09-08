@@ -1,5 +1,6 @@
 """Exercise release preparation against disposable Git repositories."""
 
+import json
 import os
 from pathlib import Path
 import subprocess
@@ -9,6 +10,7 @@ import unittest
 
 
 SCRIPT = Path(__file__).resolve().parents[1] / "scripts" / "release.py"
+WORKFLOW = SCRIPT.parents[1] / ".github" / "workflows" / "release.yml"
 BUILD = """<key>CFBundleShortVersionString</key><string>4.2.2</string>
 <key>CFBundleVersion</key><string>9</string>
 """
@@ -64,8 +66,8 @@ class ReleaseTests(unittest.TestCase):
     def push(self, plan):
         return self.release("push", self.source, plan["tag"], plan["commit"])
 
-    def advance_main(self):
-        (self.author / "app.txt").write_text("a later merge\n")
+    def advance_main(self, contents="a later merge\n"):
+        (self.author / "app.txt").write_text(contents)
         newest = self.commit("Newer feature")
         self.git(self.author, "push", "origin", "main")
         return newest
@@ -145,6 +147,56 @@ class ReleaseTests(unittest.TestCase):
         self.assertEqual(self.push(plan), {"ready": "false"})
         self.assertEqual(self.git(self.remote, "rev-parse", "main"), newest)
         self.assertNotIn(plan["tag"], self.git(self.remote, "tag"))
+
+    def finish_queued_jobs(self, active_plan, arrivals):
+        # Read the real workflow with macOS's standard-library YAML parser.
+        config = json.loads(self.run_command(
+            self.root, "/usr/bin/ruby", "-ryaml", "-rjson", "-e",
+            'puts JSON.generate(YAML.load_file(ARGV.fetch(0)).fetch("jobs").fetch("release").fetch("concurrency"))',
+            str(WORKFLOW),
+        ).stdout)
+        self.assertFalse(config.get("cancel-in-progress", False), "Do not cancel an active release")
+        policy = config.get("queue", "single")
+        self.assertIn(policy, ("single", "max"))
+        # Model GitHub's documented pending replacement, not its hosted scheduler.
+        # None represents a dry run, which occupies the group without publishing.
+        pending = []
+        for source in arrivals:
+            if policy == "single":
+                pending = [source]
+            elif len(pending) < 100:
+                pending.append(source)
+
+        self.assertEqual(self.push(active_plan), {"ready": "false"})
+        published = []
+        for source in pending:
+            if source is None:
+                continue
+            # GitHub gives each queued job a fresh checkout of its original CI SHA.
+            self.runner = self.root / f"queued-{source}"
+            self.run_command(self.root, "git", "clone", str(self.remote), str(self.runner))
+            self.git(self.runner, "checkout", "--detach", source)
+            plan = self.release("prepare", source)
+            if plan["state"] == "skip":
+                continue
+            if self.release("push", source, plan["tag"], plan["commit"])["ready"] == "true":
+                published.append(source)
+        return published
+
+    def test_latest_release_survives_older_ci_finishing_later(self):
+        active = self.prepare()
+        middle = self.advance_main("middle merge\n")
+        newest = self.advance_main("newest merge\n")
+        # C finishes CI before B while A is still packaging.
+        self.assertEqual(self.finish_queued_jobs(active, [newest, middle]), [newest])
+        self.assertEqual(self.git(self.remote, "show", "v4.2.2-10:app.txt"), "newest merge")
+        self.assertEqual(self.git(self.remote, "rev-parse", "main^"), newest)
+
+    def test_pending_release_survives_a_later_dry_run(self):
+        active = self.prepare()
+        newest = self.advance_main("newest merge\n")
+        self.assertEqual(self.finish_queued_jobs(active, [newest, None]), [newest])
+        self.assertEqual(self.git(self.remote, "show", "v4.2.2-10:app.txt"), "newest merge")
 
     def test_push_race_is_atomic(self):
         plan = self.prepare()
