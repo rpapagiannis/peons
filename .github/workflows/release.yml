@@ -1,16 +1,30 @@
 name: Release
 
-# Publishing: push a tag named v<CFBundleShortVersionString>-<CFBundleVersion>, for example v4.2.2-9,
-# after committing the matching numbers in build.sh. The job builds, tests, packages, and publishes
-# the DMG with its checksum. If a release for that tag already exists (for example one created by
-# hand from a local DMG), its assets are left untouched and only the Homebrew cask is brought up to date.
-#
-# Dry run: trigger the workflow manually from the Actions tab. That builds, tests, and packages on the
-# runner and uploads the DMG as a workflow artifact without tagging or publishing anything.
+# Modes:
+#   publish   (automatic, on a pushed tag v<CFBundleShortVersionString>-<CFBundleVersion>, e.g. v4.2.2-9)
+#             Builds, tests, packages, and publishes the DMG with its checksum, then updates the Homebrew
+#             cask when HOMEBREW_TAP_TOKEN is set. If a release for the tag already exists (for example one
+#             created by hand from a local DMG), its assets are left untouched and only the cask is updated.
+#   dry-run   (manual) Builds, tests, and packages on the runner and uploads the DMG as a workflow artifact.
+#             Nothing is tagged or published.
+#   sync-cask (manual, needs a tag) Rewrites the Homebrew cask from an already published release, using the
+#             checksum asset attached to it. Use it right after setting HOMEBREW_TAP_TOKEN to prove the token
+#             works, or to repair the cask after a failed update.
 on:
   push:
     tags: ["v*"]
   workflow_dispatch:
+    inputs:
+      mode:
+        description: "dry-run: build, test, package, upload artifact. sync-cask: update the Homebrew cask from a published release."
+        type: choice
+        options: [dry-run, sync-cask]
+        default: dry-run
+      tag:
+        description: "Release tag for sync-cask, for example v4.2.2-9"
+        type: string
+        required: false
+        default: ""
 
 permissions:
   contents: write
@@ -21,63 +35,83 @@ jobs:
     runs-on: macos-15
     env:
       GH_TOKEN: ${{ github.token }}
-      DRY_RUN: ${{ github.event_name == 'workflow_dispatch' }}
-      # Optional: a fine-grained token with contents read/write on <owner>/homebrew-peons.
+      MODE: ${{ github.event_name == 'push' && 'publish' || inputs.mode }}
+      TAG: ${{ inputs.tag || github.ref_name }}
+      # A fine-grained token with contents read/write on <owner>/homebrew-peons only.
       # When present, the cask's version, sha256, and download URL are updated automatically.
       TAP_TOKEN: ${{ secrets.HOMEBREW_TAP_TOKEN }}
     steps:
       - uses: actions/checkout@v4
 
-      - name: Read the version and build from build.sh
+      - name: Resolve the version and build
         run: |
-          version=$(sed -n 's|.*<key>CFBundleShortVersionString</key><string>\([^<]*\)</string>.*|\1|p' build.sh)
-          build=$(sed -n 's|.*<key>CFBundleVersion</key><string>\([^<]*\)</string>.*|\1|p' build.sh)
-          if [[ -z "$version" || -z "$build" ]]; then
-            echo "::error::Could not read CFBundleShortVersionString and CFBundleVersion from build.sh"
-            exit 1
+          if [[ "$MODE" == "sync-cask" ]]; then
+            if [[ ! "$TAG" =~ ^v(.+)-([0-9]+)$ ]]; then
+              echo "::error::sync-cask needs a release tag like v4.2.2-9, got '$TAG'"
+              exit 1
+            fi
+            version="${BASH_REMATCH[1]}"; build="${BASH_REMATCH[2]}"
+          else
+            version=$(sed -n 's|.*<key>CFBundleShortVersionString</key><string>\([^<]*\)</string>.*|\1|p' build.sh)
+            build=$(sed -n 's|.*<key>CFBundleVersion</key><string>\([^<]*\)</string>.*|\1|p' build.sh)
+            if [[ -z "$version" || -z "$build" ]]; then
+              echo "::error::Could not read CFBundleShortVersionString and CFBundleVersion from build.sh"
+              exit 1
+            fi
+            if [[ "$MODE" == "publish" && "$TAG" != "v${version}-${build}" ]]; then
+              echo "::error::Tag $TAG does not match build.sh, which expects v${version}-${build}"
+              exit 1
+            fi
           fi
-          if [[ "$DRY_RUN" != "true" && "$GITHUB_REF_NAME" != "v${version}-${build}" ]]; then
-            echo "::error::Tag $GITHUB_REF_NAME does not match build.sh, which expects v${version}-${build}"
-            exit 1
-          fi
+          echo "mode=$MODE tag=$TAG version=$version build=$build"
           { echo "VERSION=$version"; echo "BUILD=$build"; } >> "$GITHUB_ENV"
+
+      - name: Require the tap token for sync-cask
+        if: env.MODE == 'sync-cask' && env.TAP_TOKEN == ''
+        run: |
+          echo "::error::sync-cask needs the HOMEBREW_TAP_TOKEN repository secret"
+          exit 1
 
       - name: Check for an existing release
         id: existing
-        if: env.DRY_RUN != 'true'
+        if: env.MODE != 'dry-run'
         run: |
-          if gh release view "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" >/dev/null 2>view-error.txt; then
-            echo "A release for $GITHUB_REF_NAME already exists; its assets will not be replaced."
+          if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>view-error.txt; then
+            echo "A release for $TAG already exists; its assets will not be replaced."
             echo "exists=true" >> "$GITHUB_OUTPUT"
           else
-            echo "No release for $GITHUB_REF_NAME yet. gh said: $(cat view-error.txt)"
+            echo "No release for $TAG yet. gh said: $(cat view-error.txt)"
             echo "exists=false" >> "$GITHUB_OUTPUT"
+            if [[ "$MODE" == "sync-cask" ]]; then
+              echo "::error::sync-cask needs a published release for $TAG"
+              exit 1
+            fi
           fi
 
       - name: Build
-        if: env.DRY_RUN == 'true' || steps.existing.outputs.exists == 'false'
+        if: env.MODE == 'dry-run' || (env.MODE == 'publish' && steps.existing.outputs.exists == 'false')
         run: ./build.sh
 
       - name: Test
-        if: env.DRY_RUN == 'true' || steps.existing.outputs.exists == 'false'
+        if: env.MODE == 'dry-run' || (env.MODE == 'publish' && steps.existing.outputs.exists == 'false')
         run: ./test.sh
 
       - name: Package
-        if: env.DRY_RUN == 'true' || steps.existing.outputs.exists == 'false'
+        if: env.MODE == 'dry-run' || (env.MODE == 'publish' && steps.existing.outputs.exists == 'false')
         run: |
           ./scripts/package_release.sh
           dmg=$(ls dist/*.dmg)
           { echo "DMG=$dmg"; echo "SHA256=$(cut -d' ' -f1 "$dmg.sha256")"; } >> "$GITHUB_ENV"
 
       - name: Upload the dry-run DMG as a workflow artifact
-        if: env.DRY_RUN == 'true'
+        if: env.MODE == 'dry-run'
         uses: actions/upload-artifact@v4
         with:
           name: peons-dmg-dry-run
           path: dist/
 
       - name: Publish GitHub release
-        if: env.DRY_RUN != 'true' && steps.existing.outputs.exists == 'false'
+        if: env.MODE == 'publish' && steps.existing.outputs.exists == 'false'
         run: |
           cat > notes.md <<EOF
           ## Install
@@ -98,19 +132,19 @@ jobs:
             printing && /^## / { exit }
             printing { print }
           ' CHANGELOG.md >> notes.md
-          gh release create "$GITHUB_REF_NAME" "$DMG" "$DMG.sha256" \
+          gh release create "$TAG" "$DMG" "$DMG.sha256" \
             --repo "$GITHUB_REPOSITORY" --title "Peons $VERSION (build $BUILD)" \
             --notes-file notes.md --generate-notes
 
       - name: Read the checksum of the already published DMG
-        if: env.DRY_RUN != 'true' && steps.existing.outputs.exists == 'true' && env.TAP_TOKEN != ''
+        if: env.MODE != 'dry-run' && steps.existing.outputs.exists == 'true' && env.TAP_TOKEN != ''
         run: |
-          gh release download "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" --pattern '*.sha256' --dir sidecar
+          gh release download "$TAG" --repo "$GITHUB_REPOSITORY" --pattern '*.sha256' --dir sidecar
           sidecar=$(ls sidecar/*.sha256)
           { echo "DMG=${sidecar%.sha256}"; echo "SHA256=$(cut -d' ' -f1 "$sidecar")"; } >> "$GITHUB_ENV"
 
       - name: Update Homebrew tap
-        if: env.DRY_RUN != 'true' && env.TAP_TOKEN != ''
+        if: env.MODE != 'dry-run' && env.TAP_TOKEN != ''
         run: |
           asset=$(basename "$DMG")
           # Keep the cask's URL in step with the real asset name, including the day the -preview suffix goes away.
@@ -123,7 +157,8 @@ jobs:
             tap/Casks/peons.rb
           cd tap
           if git diff --quiet; then
-            echo "Cask already matches ${VERSION},${BUILD} and ${SHA256}; nothing to push."
+            echo "Cask already matches ${VERSION},${BUILD} and ${SHA256}; verifying push access only."
+            git push --dry-run
             exit 0
           fi
           git config user.name "github-actions[bot]"
