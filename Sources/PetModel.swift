@@ -41,6 +41,7 @@ struct PetModel {
     var portalTime = 0.0
     var portalDestination: CGPoint?
     var portalMoved = false
+    private(set) var portalOpenCount = 0
     var distance: CGFloat = 0
     private(set) var wrapCount = 0
     private(set) var lastThrowVelocity = CGVector.zero
@@ -187,9 +188,10 @@ struct PetModel {
         return true
     }
 
-    // Returns false when a portal is already open or Rick is being held, so callers can skip their voice line.
+    // Count accepted openings so the controller can cue manual and autonomous portals exactly once.
     @discardableResult mutating func portal(to point: CGPoint) -> Bool {
         guard portalTime == 0 && !isDragging else { return false }
+        portalOpenCount += 1
         portalTime = 0.85
         portalDestination = groundDestination(near: point)
         portalMoved = false

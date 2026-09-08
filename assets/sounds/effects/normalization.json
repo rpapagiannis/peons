@@ -1,0 +1,43 @@
+{
+  "clips" : [
+    {
+      "gainDB" : -0.8995847215873027,
+      "id" : "portal-open",
+      "input" : {
+        "channels" : 2,
+        "durationSeconds" : 2.856,
+        "frames" : 137088,
+        "fullScaleSamples" : 0,
+        "rmsDBFS" : -19.100415278412697,
+        "samplePeakDBFS" : -4.577624018049083,
+        "sampleRate" : 48000
+      },
+      "originalFile" : "assets/sounds/effects/portal_open.mp3",
+      "originalSHA256" : "42d823180138f0da595e34e3b4fd9439c1760388246de2bc99860452d316003d",
+      "output" : {
+        "channels" : 2,
+        "durationSeconds" : 2.856,
+        "frames" : 137088,
+        "fullScaleSamples" : 0,
+        "rmsDBFS" : -19.999998441825095,
+        "samplePeakDBFS" : -5.477073056112931,
+        "sampleRate" : 48000
+      },
+      "outputFile" : "assets/sounds/effects/normalized/portal_open.wav",
+      "outputSHA256" : "9cabdea7eadf533d5b4082e13e502e615b0e989ab27c9feebfa928d43d134a37",
+      "peakLimited" : false,
+      "sourceURL" : "https://soundboardguy.com/wp-content/uploads/2022/12/portal-gun-sound-effect.mp3"
+    }
+  ],
+  "method" : "One constant gain per clip, measured over all decoded samples and channels. No trimming, compression, denoising, or playback.",
+  "minimumSamplePeakHeadroomDB" : 3,
+  "outputFormat" : "16-bit signed little-endian PCM WAV; original sample rate and channel count",
+  "samplePeakCeilingDBFS" : -3.01,
+  "schemaVersion" : 1,
+  "script" : "scripts/prepare_audio.swift",
+  "sources" : {
+    "SoundboardGuy" : "https://soundboardguy.com/sounds/rick-and-morty-portal-sound/"
+  },
+  "targetRMSDBFS" : -20,
+  "validation" : "Outputs were decoded again and checked for preserved frame count, duration, rate and channels; RMS within 0.02 dB of expected gain; sample peaks at or below -3 dBFS; no full-scale samples. This is objective level balancing, not a listening test or perceptual LUFS normalization."
+}

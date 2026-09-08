@@ -130,7 +130,9 @@ final class PetController: NSObject, NSApplicationDelegate, NSWindowDelegate, NS
     var speech: String?
     var speechUntil: Double = 0
     var dialogue = DialogueDirector()
-    let voice = VoicePlayer()
+    let sound: SoundPlaying
+    private var handledPortalOpenCount = 0
+    private var preferences = UserDefaults.standard
     var suppressResign = false
     var hovering = false
     var menuOpen = false
@@ -143,7 +145,13 @@ final class PetController: NSObject, NSApplicationDelegate, NSWindowDelegate, NS
     @Published var chatterEnabled = true
     @Published var volume: Double = 0.5
 
+    init(sound:SoundPlaying = SoundPlayer()) {
+        self.sound=sound
+        super.init()
+    }
+
     func loadPreferences(from defaults:UserDefaults = .standard) {
+        preferences=defaults
         soundEnabled=defaults.object(forKey:"soundEnabled") as? Bool ?? true
         chatterEnabled=defaults.object(forKey:"chatterEnabled") as? Bool ?? true
         volume=min(1,max(0,defaults.object(forKey:"voiceVolume") as? Double ?? 0.5))
@@ -229,6 +237,7 @@ final class PetController: NSObject, NSApplicationDelegate, NSWindowDelegate, NS
         hovering = (overPet || menuOpen) && model.mode == .roaming
         model.isHovered=hovering
         if !menuOpen { model.step(dt) }
+        handlePortalOpening(now:now)
         if speech != nil && now >= speechUntil { speech=nil }
         if chatterEnabled && model.mode == .roaming && !model.isDragging && !menuOpen && now>=dialogue.nextAutomaticAt { say(.idle) }
         placePanel()
@@ -284,22 +293,23 @@ final class PetController: NSObject, NSApplicationDelegate, NSWindowDelegate, NS
         guard !isHidden,model.mode != .paused else { return }
         let now=ProcessInfo.processInfo.systemUptime
         guard let line=dialogue.next(character:model.character,action:action,now:now) else { return }
-        let duration=soundEnabled ? voice.play(line,volume:volume) : 0
+        let duration=soundEnabled ? sound.play(line,volume:volume) : 0
         speech=line.text;speechUntil=now+max(seconds,duration+0.35,2)
         dialogue.occupy(until:speechUntil+0.3,now:now)
     }
-    func silence() { voice.stop();speech=nil;dialogue.reset(now:ProcessInfo.processInfo.systemUptime) }
+    func silence() { sound.stop();speech=nil;dialogue.reset(now:ProcessInfo.processInfo.systemUptime) }
     @objc func shout() { say(.shout,for:2.5) }
     @objc func toggleSound() {
-        soundEnabled.toggle();UserDefaults.standard.set(soundEnabled,forKey:"soundEnabled")
-        if !soundEnabled { voice.stop() }
+        soundEnabled.toggle();preferences.set(soundEnabled,forKey:"soundEnabled")
+        if !soundEnabled { sound.stop() }
         writeDiagnostics()
     }
     @objc func toggleChatter() {
-        chatterEnabled.toggle();UserDefaults.standard.set(chatterEnabled,forKey:"chatterEnabled")
+        chatterEnabled.toggle();preferences.set(chatterEnabled,forKey:"chatterEnabled")
         dialogue.rescheduleAutomatic(now:ProcessInfo.processInfo.systemUptime)
     }
-    func setVolume(_ value:Double) { volume=min(1,max(0,value));voice.setVolume(volume);UserDefaults.standard.set(volume,forKey:"voiceVolume") }
+    // Keep the existing preference key so saved voice volumes also apply to effects.
+    func setVolume(_ value:Double) { volume=min(1,max(0,value));sound.setVolume(volume);preferences.set(volume,forKey:"voiceVolume") }
     @objc func takeControl() {
         if isHidden { toggleHidden() }
         model.setMode(.controlled); displayedMode = .controlled
@@ -327,13 +337,28 @@ final class PetController: NSObject, NSApplicationDelegate, NSWindowDelegate, NS
     @objc func jump() { if model.jump() { say(.jump,for:1.5) } }
     @objc func portal() {
         let destination=NSScreen.screens.randomElement()?.visibleFrame ?? model.bounds
-        // A refused portal (one already open, or Rick held mid-drag) must not consume a voice line.
-        if model.portal(to:CGPoint(x:CGFloat.random(in:destination.minX...destination.maxX),y:destination.minY+1)) { say(.portal,for:1.4) }
+        openPortal(to:CGPoint(x:CGFloat.random(in:destination.minX...destination.maxX),y:destination.minY+1))
     }
     @objc func summon() {
         if isHidden { toggleHidden() }
         // Menu-driven summoning must not steal keyboard focus from the current app.
-        if model.portal(to:NSEvent.mouseLocation) { say(.summon,for:3) }
+        openPortal(to:NSEvent.mouseLocation)
+    }
+    @discardableResult func openPortal(to point:CGPoint) -> Bool {
+        guard model.portal(to:point) else { return false }
+        handlePortalOpening()
+        return true
+    }
+    func handlePortalOpening(now:Double = ProcessInfo.processInfo.systemUptime) {
+        guard model.portalOpenCount != handledPortalOpenCount else { return }
+        // Consume even muted/hidden openings; unmuting or showing Rick must not replay old cues.
+        handledPortalOpenCount=model.portalOpenCount
+        guard model.portalTime > 0,!isHidden,model.mode != .paused else { return }
+        sound.stop();speech=nil;speechUntil=0
+        dialogue.reset(now:now)
+        let duration=soundEnabled ? sound.play(.portalOpen,volume:volume) : 0
+        // Reserve the whole recording (including its tail) so idle chatter cannot cut it off.
+        dialogue.occupy(until:now+max(model.portalTime,duration)+0.3,now:now)
     }
     @objc func toggleHidden() {
         isHidden.toggle()
@@ -344,7 +369,7 @@ final class PetController: NSObject, NSApplicationDelegate, NSWindowDelegate, NS
         writeDiagnostics()
     }
     @objc func chooseSpeed(_ sender: NSMenuItem) {
-        model.speed=CGFloat(sender.tag);UserDefaults.standard.set(sender.tag,forKey:"speed")
+        model.speed=CGFloat(sender.tag);preferences.set(sender.tag,forKey:"speed")
     }
     @objc func quit() { NSApp.terminate(nil) }
     @objc func screensChanged() {
@@ -363,7 +388,7 @@ final class PetController: NSObject, NSApplicationDelegate, NSWindowDelegate, NS
         if let window=notification.object as? NSWindow,window === controlWindow { controlWindow=nil }
     }
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool { false }
-    func applicationWillTerminate(_ notification:Notification) { voice.stop();timer?.invalidate() }
+    func applicationWillTerminate(_ notification:Notification) { sound.stop();timer?.invalidate() }
     func applicationShouldHandleReopen(_ sender: NSApplication,hasVisibleWindows flag: Bool) -> Bool { showControls();return true }
 
     func item(_ title: String,_ action: Selector?,key: String = "") -> NSMenuItem {
@@ -389,7 +414,7 @@ final class PetController: NSObject, NSApplicationDelegate, NSWindowDelegate, NS
         menu.addItem(item("Bring Rick here",#selector(summon)))
         menu.addItem(item("Shout · E",#selector(shout)))
         menu.addItem(.separator())
-        let sound=item("Voices · M to mute",#selector(toggleSound));sound.state=soundEnabled ? .on : .off;menu.addItem(sound)
+        let sound=item("Sound · M to mute",#selector(toggleSound));sound.state=soundEnabled ? .on : .off;menu.addItem(sound)
         let chatter=item("Occasional chatter",#selector(toggleChatter));chatter.state=chatterEnabled ? .on : .off;menu.addItem(chatter)
         let speedMenu=NSMenu()
         for (name,value) in [("Chill",95),("Normal",150),("Unhinged",240)] {
@@ -433,7 +458,7 @@ final class PetController: NSObject, NSApplicationDelegate, NSWindowDelegate, NS
     func writeDiagnostics() {
         let value="\(model.character.name); \(model.mode.rawValue)"
         if value != accessibilityState { petView?.setAccessibilityValue(value);accessibilityState=value }
-        var destination=UserDefaults.standard.string(forKey:"developmentDiagnostics")
+        var destination=preferences.string(forKey:"developmentDiagnostics")
         if let index=CommandLine.arguments.firstIndex(of:"--diagnostics"),CommandLine.arguments.count>index+1 { destination=CommandLine.arguments[index+1] }
         guard let destination else { return }
         let state:[String:Any] = ["mode":model.mode.rawValue,"x":model.position.x,"y":model.position.y,
@@ -446,7 +471,7 @@ final class PetController: NSObject, NSApplicationDelegate, NSWindowDelegate, NS
             "facing":model.facing.rawValue,"phase":model.phase,"artwork":PetRenderer.hasArtwork(for:model.character),
             "activeSurface":model.activeSurface,"surfaces":model.surfaces.map{[$0.frame.minX,$0.frame.minY,$0.frame.width,$0.frame.height,$0.visibleFrame.minY]},
             "separateSpaces":NSScreen.screensHaveSeparateSpaces,"seamWindows":seamPanels.values.filter{$0.isVisible}.count,
-            "soundEnabled":soundEnabled,"volume":volume,"chatterEnabled":chatterEnabled,"speech":speech ?? "","audioPlaying":voice.isPlaying,"audioLine":voice.playingLineID ?? "",
+            "soundEnabled":soundEnabled,"volume":volume,"chatterEnabled":chatterEnabled,"speech":speech ?? "","audioPlaying":sound.isPlaying,"audioLine":sound.playingLineID ?? "","audioEffect":sound.playingEffectID ?? "","portalOpenCount":model.portalOpenCount,
             "screen":[model.bounds.minX,model.bounds.minY,model.bounds.width,model.bounds.height]]
         if let data=try? JSONSerialization.data(withJSONObject:state,options:[.prettyPrinted,.sortedKeys]) {
             try? data.write(to:URL(fileURLWithPath:destination),options:.atomic)
@@ -534,8 +559,8 @@ struct ControlRoom: View {
                 Spacer()
                 Button { owner.toggleSound() } label: {
                     Image(systemName:owner.soundEnabled ? "speaker.wave.2.fill" : "speaker.slash.fill").frame(width:23)
-                }.buttonStyle(.plain).accessibilityLabel(owner.soundEnabled ? "Mute voices" : "Unmute voices")
-                Slider(value:Binding(get:{owner.volume},set:{owner.setVolume($0)}),in:0...1).frame(width:78).accessibilityLabel("Voice volume")
+                }.buttonStyle(.plain).accessibilityLabel(owner.soundEnabled ? "Mute sound" : "Unmute sound")
+                Slider(value:Binding(get:{owner.volume},set:{owner.setVolume($0)}),in:0...1).frame(width:78).accessibilityLabel("Sound volume")
             }.font(.system(size:12,weight:.semibold)).padding(.top,17)
             HStack(alignment:.top,spacing:12) {
                 VStack(alignment:.leading,spacing:10) {

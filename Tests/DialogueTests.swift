@@ -58,10 +58,11 @@ import AVFAudio
         timing.occupy(until:195,now:95)
         precondition(timing.next(character:character,action:.shout,now:96)==character.lines[3] && timing.nextLineAt==98.5,"Direct input must replace the active clip immediately")
 
-        precondition(VoicePlayer.assetURL("not-a-real-recording.mp3")==nil)
-        let assets=Set(CharacterCatalog.all.flatMap{$0.lines.compactMap(\.audioAsset)}).sorted()
+        precondition(SoundPlayer.assetURL("not-a-real-recording.mp3")==nil)
+        precondition(SoundEffect.allCases.allSatisfy{$0.audioAsset != nil},"Every effect must have a manifest entry")
+        let assets=Set(CharacterCatalog.all.flatMap{$0.lines.compactMap(\.audioAsset)} + SoundEffect.allCases.compactMap(\.audioAsset)).sorted()
         for asset in assets {
-            guard let url=VoicePlayer.assetURL(asset) else { fatalError("Missing bundled recording: \(asset)") }
+            guard let url=SoundPlayer.assetURL(asset) else { fatalError("Missing bundled recording: \(asset)") }
             let file=try AVAudioFile(forReading:url,commonFormat:.pcmFormatFloat32,interleaved:false)
             let format=file.processingFormat
             precondition(file.length>0 && format.sampleRate>0 && format.channelCount>0,"Invalid audio format: \(asset)")
@@ -82,6 +83,26 @@ import AVFAudio
                 }
             }
             precondition(frames>0 && peak>0.0001,"Recording must decode into audible samples: \(asset)")
+        }
+        // Headless CI can decode assets without an output device. Opt in locally to real playback.
+        if CommandLine.arguments.contains("--audio-playback") {
+            let sound=SoundPlayer()
+            precondition(sound.play(character.lines[0],volume:0)>0 && sound.playingLineID == character.lines[0].id,
+                         "Playback smoke tests require an available macOS audio output")
+            precondition(sound.play(.portalOpen,volume:0)>0 && sound.playingEffectID == "portal-open" && sound.playingLineID == nil,
+                         "An effect must replace the voice and clear its diagnostic ID")
+            precondition(sound.play(character.lines[1],volume:0)>0 && sound.playingLineID == character.lines[1].id && sound.playingEffectID == nil,
+                         "A voice must replace the effect and clear its diagnostic ID")
+            precondition(sound.play(CharacterLine("missing","Missing",audio:"missing.wav"),volume:0)==0 && !sound.isPlaying && sound.playingLineID == nil && sound.playingEffectID == nil,
+                         "Missing audio must fail silently and leave no stale playback state")
+            sound.play(.portalOpen,volume:0);sound.stop()
+            precondition(!sound.isPlaying && sound.playingLineID == nil && sound.playingEffectID == nil)
+            let duration=sound.play(.portalOpen,volume:0)
+            precondition(duration>0)
+            RunLoop.current.run(until:Date(timeIntervalSinceNow:duration+0.3))
+            precondition(!sound.isPlaying && sound.playingLineID == nil && sound.playingEffectID == nil,
+                         "A naturally finished effect must not remain active in diagnostics")
+            print("Passed real audio playback at zero volume: voice/effect replacement, missing asset, stop, and natural completion.")
         }
         print("Passed shipped Rick dialogue and manifest coverage, rapid input, cooldown/reset semantics, and \(assets.count) audio decodes.")
     }

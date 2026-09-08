@@ -87,7 +87,7 @@ enum AppConfigurationTests {
             }
         }
         let titles = Set(menu.items.map(\.title))
-        expect(titles.contains("Rick controls…") && titles.contains("Voices · M to mute") && titles.contains("Occasional chatter") && titles.contains("Speed"),
+        expect(titles.contains("Rick controls…") && titles.contains("Sound · M to mute") && titles.contains("Occasional chatter") && titles.contains("Speed"),
                "Rick controls, voice settings, and speed must remain accessible")
 
         func inputController() -> (PetController, PetView) {

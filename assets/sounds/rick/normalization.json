@@ -499,7 +499,7 @@
   "outputFormat" : "16-bit signed little-endian PCM WAV; original sample rate and channel count",
   "samplePeakCeilingDBFS" : -3.01,
   "schemaVersion" : 1,
-  "script" : "scripts/prepare_rick_voice.swift",
+  "script" : "scripts/prepare_audio.swift",
   "sources" : {
     "Mr3zee/peonping-rick-and-morty-clean@v1.0.0" : "125e30394baa24b70958e69ac7d87a6f5f401428",
     "PeonPing/og-packs@v1.0.0" : "ec8630d43ae2cdb2af2617aa69a3df7737ec1c6d"

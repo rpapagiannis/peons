@@ -19,5 +19,8 @@ xcrun swiftc -swift-version 5 -module-cache-path "$staging/module-cache" Sources
 "$staging/canvas-tests"
 xcrun swiftc -swift-version 5 -D APP_TESTS -module-cache-path "$staging/module-cache" Sources/*.swift Tests/AppConfigurationTests.swift -o "$staging/app-configuration-tests" -framework AppKit -framework SwiftUI -framework AVFAudio
 "$staging/app-configuration-tests"
-xcrun swiftc -swift-version 5 -module-cache-path "$staging/module-cache" Sources/Characters.swift Sources/Dialogue.swift Sources/VoicePlayer.swift Tests/DialogueTests.swift -o "$staging/dialogue-tests" -framework AVFAudio
-"$staging/dialogue-tests"
+xcrun swiftc -swift-version 5 -D APP_TESTS -module-cache-path "$staging/module-cache" Sources/*.swift Tests/PortalSoundTests.swift -o "$staging/portal-sound-tests" -framework AppKit -framework SwiftUI -framework AVFAudio
+"$staging/portal-sound-tests"
+xcrun swiftc -swift-version 5 -module-cache-path "$staging/module-cache" Sources/Characters.swift Sources/Dialogue.swift Sources/SoundPlayer.swift Tests/DialogueTests.swift -o "$staging/dialogue-tests" -framework AVFAudio
+# Optional --audio-playback exercises the real player at zero volume on a Mac with audio output.
+"$staging/dialogue-tests" "$@"

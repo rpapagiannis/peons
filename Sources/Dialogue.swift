@@ -1,6 +1,6 @@
 import Foundation
 
-// Every direct interaction advances the same full, ordered voice-pack cycle.
+// Every spoken interaction advances the same full, ordered voice-pack cycle.
 struct DialogueDirector {
     private var cursors: [String:Int] = [:]
     private(set) var lastID: String?

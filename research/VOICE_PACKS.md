@@ -21,7 +21,7 @@ C-137's manifest and website description misleadingly say all source sounds were
 
 The three signature extras were much quieter than the official clips: approximately -25.55 to -28.72 dBFS RMS, versus -19.12 to -11.80 for the official 14. The selected recordings last 0.53–2.28 seconds, totaling 24.15 seconds.
 
-`scripts/prepare_rick_voice.swift` applies one constant gain per clip toward **-20 dBFS RMS**, capped at a **-3.01 dBFS sample peak**. The extra 0.01 dB margin accommodates 16-bit conversion while preserving at least 3 dB of sample-peak headroom. It preserves duration, frames, sample rate, and channels; it does not trim, compress, denoise, or synthesize speech. RMS balancing is not perceptual LUFS normalization.
+`scripts/prepare_audio.swift` applies one constant gain per clip toward **-20 dBFS RMS**, capped at a **-3.01 dBFS sample peak**. The extra 0.01 dB margin accommodates 16-bit conversion while preserving at least 3 dB of sample-peak headroom. It preserves duration, frames, sample rate, and channels; it does not trim, compress, denoise, or synthesize speech. RMS balancing is not perceptual LUFS normalization. The same preparation function now handles the [portal effect](PORTAL_SOUND.md); the 17 voice WAVs remain byte-for-byte unchanged.
 
 | Peak-capped clip | Final RMS dBFS | Reason |
 | --- | ---: | --- |
@@ -34,7 +34,7 @@ The remaining 14 clips reach -20 dBFS RMS within 0.02 dB. Every derived WAV was 
 Reproduce on macOS without network access or audio playback:
 
 ```sh
-swift scripts/prepare_rick_voice.swift
+swift scripts/prepare_audio.swift
 ```
 
 The script checks each original MP3 against its pinned upstream SHA-256 before conversion. macOS audio decoding services must be accessible to the process. Original MP3 files remain unmodified in the source tree. `assets/sounds/rick/lines.json` is the actual playback inventory, referencing only `normalized/*.wav`. `normalization.json` records per-file original/output checksums, source URLs and commits, gains, decoded measurements, and validation. `openpeon.json` remains the original upstream 14-clip metadata for provenance; it is not the app's custom 17-clip playback inventory.
