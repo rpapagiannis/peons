@@ -33,6 +33,11 @@ struct PetModel {
     private var roamingJumpDelay: Double?
     private var roamingPortalDelay: Double?
     private var roamingActionDelay = 1.0
+    private struct RoamingJump {
+        let direction: CGFloat
+        var shouldDouble: Bool
+    }
+    private var roamingJump: RoamingJump?
     private(set) var isDragging = false
     private(set) var isThrown = false
     private(set) var jumpsUsed = 0
@@ -157,6 +162,7 @@ struct PetModel {
         roamingJumpDelay = nil
         roamingPortalDelay = nil
         roamingActionDelay = 1
+        roamingJump = nil
     }
     mutating func pressKey(_ key: UInt16) {
         if !keys.contains(key) { minimumKeyTime[key] = age + 0.055 }
@@ -183,6 +189,8 @@ struct PetModel {
         isThrown = false
         roamingJumpDelay = nil
         roamingActionDelay = 2
+        // An accepted manual second jump also consumes any planned automatic boost.
+        roamingJump?.shouldDouble = false
         if onGround { jumpPreparation = 0.10 }
         else { velocity.dy = jumpImpulse }
         return true
@@ -302,7 +310,17 @@ struct PetModel {
 
     private mutating func updateRoamingActions<R: RandomNumberGenerator>(_ dt: Double, using random: inout R) {
         guard mode == .roaming else { return }
-        if isHovered { roamingActionDelay = max(roamingActionDelay, 1); return }
+        if isHovered {
+            roamingJump = nil
+            roamingActionDelay = max(roamingActionDelay, 1)
+            return
+        }
+        if onGround && jumpPreparation == 0 { roamingJump = nil }
+        // Spend the second jump near the top of the first rise, using the normal jump physics.
+        if roamingJump?.shouldDouble == true && !onGround && !isThrown &&
+            jumpPreparation == 0 && jumpsUsed == 1 && velocity.dy <= jumpImpulse * 0.3 {
+            jump()
+        }
         guard onGround, !isThrown, jumpPreparation == 0, landingTime == 0 else { return }
         // Count only unoccupied time on the floor, so hovering, throws and focus changes
         // cannot build up a burst of overdue actions. Portals take priority if both are due.
@@ -321,6 +339,10 @@ struct PetModel {
             roamingPortalDelay = Double.random(in: 25...45, using: &random)
         }
         if let delay = roamingJumpDelay, delay <= 0, jump() {
+            let direction: CGFloat = roamDirection < 0 ? -1 : 1
+            roamingJump = RoamingJump(direction: direction,
+                                      shouldDouble: Double.random(in: 0...1, using: &random) < 1.0 / 3.0)
+            velocity.dx = direction * speed
             isResting = false
             frontLocked = false
             nextDecision = age + 2
@@ -364,6 +386,9 @@ struct PetModel {
             if held.contains(0) || held.contains(123) { direction -= 1 }
             if held.contains(2) || held.contains(124) { direction += 1 }
             if held.contains(56) || held.contains(60) { actualSpeed *= 2 }
+        } else if mode == .roaming, let roamingJump, !isThrown && !isHovered {
+            // Hold full directional input through both jumps instead of coasting at walking pace.
+            direction = roamingJump.direction
         } else if mode == .roaming && onGround && !isThrown {
             if age >= nextDecision && !isHovered && jumpPreparation == 0 {
                 isResting = Double.random(in: 0...1, using: &random) < 0.24
@@ -408,7 +433,10 @@ struct PetModel {
                 if isThrown && impact > 180 && mode != .paused { velocity.dy = impact * 0.48 }
                 else {
                     velocity.dy = 0
-                    if jumpPreparation == 0 { jumpsUsed = 0 }
+                    if jumpPreparation == 0 {
+                        jumpsUsed = 0
+                        roamingJump = nil
+                    }
                     if abs(velocity.dx) < 4 { isThrown = false }
                 }
             }

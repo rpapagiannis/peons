@@ -4,6 +4,8 @@ After CI passes on `main`, the release workflow advances the build number and mo
 
 ## Unreleased
 
+- Give about one in three free-roam jumps a second boost near the top, and hold full directional movement at the selected speed throughout every autonomous jump.
+
 ## 4.2.2 (build 11)
 
 - Play the recorded Rick and Morty portal effect once for each manual, summoned, or autonomous portal opening. Refused requests stay silent and portal actions preserve the voice-line cycle.
