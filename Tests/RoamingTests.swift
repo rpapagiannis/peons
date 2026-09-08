@@ -193,6 +193,22 @@ enum RoamingTests {
         expect(across.jumps.count > 10 && across.arrivals > 5,
                "Free roam must keep working with monitor gaps, negative origins and unequal floors")
 
+        // An upper display's candidate can fall onto the lower display, where a side Dock
+        // clamps it again. Seed 4 at 60 fps previously opened a 106-point trip after 354 s.
+        let stackedDisplays = [
+            DesktopSurface(frame: CGRect(x: 0, y: 0, width: 1000, height: 800),
+                           visibleFrame: CGRect(x: 100, y: 0, width: 900, height: 780)),
+            DesktopSurface(frame: CGRect(x: 0, y: 800, width: 1600, height: 900))
+        ]
+        for fps in [60.0, 30.0, 120.0] {
+            for seed in [UInt64(4), 42] {
+                var stacked = roam(on: stackedDisplays), stackedRandom = SeededRandom(state: seed)
+                let trace = advance(&stacked, random: &stackedRandom, seconds: 600, fps: fps)
+                expect(trace.arrivals > 5 && trace.jumps.count > 10,
+                       "Stacked displays with a side Dock must retain useful portals and jumps at \(fps) fps, seed \(seed)")
+            }
+        }
+
         var (removed, removedRandom) = due(.portal)
         removed.step(1.0 / 60, using: &removedRandom)
         removed.configureDesktop([DesktopSurface(frame: CGRect(x: -900, y: -100, width: 700, height: 700))])

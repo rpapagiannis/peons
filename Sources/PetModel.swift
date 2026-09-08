@@ -284,8 +284,18 @@ struct PetModel {
             if left <= leftEnd { destinations.append((left...leftEnd, frame.midY)) }
             if rightStart <= right { destinations.append((rightStart...right, frame.midY)) }
         }
-        guard let destination = destinations.randomElement(using: &random) else { return nil }
-        return groundDestination(near: CGPoint(x: CGFloat.random(in: destination.x, using: &random), y: destination.y))
+        guard let range = destinations.randomElement(using: &random) else { return nil }
+        var destination = groundDestination(near: CGPoint(x: CGFloat.random(in: range.x, using: &random), y: range.y))
+        // Snapping from an upper display can change the floor display and clamp x again.
+        // Require a stable point so portal setup and arrival cannot shorten the trip.
+        for _ in 0...surfaces.count {
+            let snapped = groundDestination(near: destination)
+            if snapped == destination {
+                return abs(destination.x - position.x) >= separation ? destination : nil
+            }
+            destination = snapped
+        }
+        return nil
     }
 
     private mutating func updateRoamingActions<R: RandomNumberGenerator>(_ dt: Double, using random: inout R) {
@@ -305,7 +315,7 @@ struct PetModel {
                 nextDecision = age + 2
                 return
             }
-            // A very narrow desktop may have no useful destination. Keep walking and jumping.
+            // A narrow desktop or floor snapping can leave no useful trip. Keep walking and jumping.
             roamingPortalDelay = Double.random(in: 25...45, using: &random)
         }
         if let delay = roamingJumpDelay, delay <= 0, jump() {
