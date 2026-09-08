@@ -23,6 +23,12 @@ enum RoamingTests {
 
     struct Trace {
         var jumps: [Double] = []
+        var doubleJumps: [Double] = []
+        var singleJumpPeaks: [CGFloat] = []
+        var doubleJumpPeaks: [CGFloat] = []
+        private var jumpDirection: CGFloat?
+        private var currentJumpPeak: CGFloat = 0
+        private var currentJumpIsDouble = false
         var portals: [Double] = []
         var destinations: [CGPoint] = []
         var peak: CGFloat = 0
@@ -36,10 +42,35 @@ enum RoamingTests {
             model.step(dt, using: &random)
             if before.jumpPreparation == 0 && model.jumpPreparation > 0 {
                 jumps.append(model.age)
+                jumpDirection = before.roamDirection < 0 ? -1 : 1
+                currentJumpPeak = 0
+                currentJumpIsDouble = false
                 expect(before.mode == .roaming && before.onGround && !before.isThrown && before.landingTime <= dt,
                        "An autonomous jump must start from settled free roam")
                 expect(!before.isHovered && !before.isDragging && before.portalTime == 0,
                        "An autonomous jump must not interrupt interaction or a portal")
+            }
+            if before.jumpsUsed == 1 && model.jumpsUsed == 2 {
+                doubleJumps.append(model.age)
+                currentJumpIsDouble = true
+                expect(before.mode == .roaming && !before.onGround && !before.isThrown &&
+                       !before.isHovered && !before.isDragging && before.portalTime == 0,
+                       "An automatic second jump must belong to an uninterrupted roaming jump")
+                expect(model.velocity.dy > before.velocity.dy + 400,
+                       "A double jump must add a real upward boost")
+            }
+            if let direction = jumpDirection {
+                currentJumpPeak = max(currentJumpPeak, model.jumpHeight)
+                if !model.onGround || model.jumpPreparation > 0 {
+                    expect(abs(model.velocity.dx - direction * model.speed) < 0.001,
+                           "Every autonomous jump must hold full speed in its original direction")
+                    expect(model.facing == (direction > 0 ? .right : .left),
+                           "Rick must face the direction of his roaming jump")
+                } else {
+                    if currentJumpIsDouble { doubleJumpPeaks.append(currentJumpPeak) }
+                    else { singleJumpPeaks.append(currentJumpPeak) }
+                    jumpDirection = nil
+                }
             }
             if before.portalTime == 0 && model.portalTime > 0 {
                 portals.append(model.age)
@@ -98,17 +129,34 @@ enum RoamingTests {
         fatalError("Free roam never scheduled \(action)")
     }
 
+    private static func dueDoubleJump() -> (PetModel, SeededRandom) {
+        var model = roam(), random = SeededRandom(state: 42)
+        for _ in 0..<10800 {
+            let previous = model, previousRandom = random
+            model.step(1.0 / 60, using: &random)
+            if previous.jumpsUsed == 1 && model.jumpsUsed == 2 { return (previous, previousRandom) }
+        }
+        fatalError("Free roam never scheduled a double jump")
+    }
+
     static func main() {
         // Different refresh rates and random streams must all produce both behaviors,
         // while retaining quiet stretches of walking and resting between them.
         for fps in [30.0, 60.0, 120.0] {
+            var singles = 0, doubles = 0
             for seed in [UInt64(1), 42, 2026, 987654] {
                 var model = roam(), random = SeededRandom(state: seed)
                 let trace = advance(&model, random: &random, seconds: 180, fps: fps)
                 expect(trace.jumps.count >= 5 && trace.portals.count >= 2,
                        "Free roam must reliably jump and open portals at \(fps) fps, seed \(seed)")
-                expect(trace.peak > 350 && trace.peak < 385 && trace.landings >= 5,
+                expect(trace.peak > 350 && trace.peak < 770 && trace.landings >= 5,
                        "Autonomous jumps must use the high-jump physics and land again")
+                expect(trace.singleJumpPeaks.allSatisfy { $0 > 350 && $0 < 385 },
+                       "Single roaming jumps must retain their normal height")
+                expect(trace.doubleJumpPeaks.allSatisfy { $0 > 650 && $0 < 770 },
+                       "Double roaming jumps must gain substantial height without a third boost")
+                singles += trace.singleJumpPeaks.count
+                doubles += trace.doubleJumpPeaks.count
                 expect(trace.walkingFrames > 0 && trace.restingFrames > 0,
                        "Free roam must still include walking and resting")
                 expect(trace.arrivals >= trace.portals.count - 1,
@@ -120,7 +168,68 @@ enum RoamingTests {
                     expect(second - first >= 25, "Autonomous portals must remain occasional")
                 }
             }
+            expect(singles > 0 && doubles > 0, "Free roam must mix single and double jumps at \(fps) fps")
         }
+
+        let (jumpReady, jumpReadyRandom) = due(.jump)
+        for fps in [30.0, 60.0, 120.0] {
+            for speed: CGFloat in [95, 150, 240] {
+                for direction: CGFloat in [-1, 1] {
+                    var model = jumpReady, random = jumpReadyRandom
+                    model.speed = speed
+                    model.roamDirection = direction
+                    model.isResting = true
+                    model.velocity = .zero
+                    let trace = advance(&model, random: &random, seconds: 4, fps: fps)
+                    expect(trace.jumps.count == 1 && trace.landings == 1,
+                           "A jump from rest must launch at full speed and land at \(speed), \(fps) fps")
+                }
+            }
+        }
+
+        // Interrupt a real, pending second jump, then release the interruption while still airborne.
+        let (doubleReady, doubleReadyRandom) = dueDoubleJump()
+        var uninterrupted = doubleReady, uninterruptedRandom = doubleReadyRandom
+        let doubleTrace = advance(&uninterrupted, random: &uninterruptedRandom, seconds: 3)
+        expect(doubleTrace.doubleJumps.count == 1 && uninterrupted.onGround && uninterrupted.jumpsUsed == 0,
+               "A planned double jump must boost exactly once and recharge on landing")
+        for mode in [PetMode.controlled, .paused] {
+            var model = doubleReady, random = doubleReadyRandom
+            model.setMode(mode)
+            let interrupted = advance(&model, random: &random, seconds: 0.05)
+            model.setMode(.roaming)
+            let resumed = advance(&model, random: &random, seconds: 3)
+            expect(interrupted.doubleJumps.isEmpty && resumed.doubleJumps.isEmpty && model.onGround,
+                   "\(mode) must cancel a queued double jump even after returning to free roam")
+        }
+        var hoveredDouble = doubleReady, hoveredDoubleRandom = doubleReadyRandom
+        hoveredDouble.isHovered = true
+        let hoveringDouble = advance(&hoveredDouble, random: &hoveredDoubleRandom, seconds: 0.05)
+        hoveredDouble.isHovered = false
+        let releasedDouble = advance(&hoveredDouble, random: &hoveredDoubleRandom, seconds: 3)
+        expect(hoveringDouble.doubleJumps.isEmpty && releasedDouble.doubleJumps.isEmpty && hoveredDouble.onGround,
+               "Hover must cancel the second jump without replaying it when the pointer leaves")
+
+        var draggedDouble = doubleReady, draggedDoubleRandom = doubleReadyRandom
+        draggedDouble.beginDrag(at: draggedDouble.age)
+        draggedDouble.drag(to: CGPoint(x: 700, y: 400), at: draggedDouble.age + 0.1)
+        advance(&draggedDouble, random: &draggedDoubleRandom, seconds: 0.1)
+        draggedDouble.endDrag(at: draggedDouble.age)
+        let thrownDouble = advance(&draggedDouble, random: &draggedDoubleRandom, seconds: 3)
+        expect(thrownDouble.doubleJumps.isEmpty,
+               "Picking Rick up must discard his pending double jump before he is thrown")
+
+        var portalledDouble = doubleReady, portalledDoubleRandom = doubleReadyRandom
+        expect(portalledDouble.portal(to: CGPoint(x: 300, y: 0)), "A manual portal can interrupt a planned double jump")
+        let afterDoublePortal = advance(&portalledDouble, random: &portalledDoubleRandom, seconds: 3)
+        expect(afterDoublePortal.doubleJumps.isEmpty && portalledDouble.onGround,
+               "A portal must discard the pending double jump")
+
+        var manualDouble = doubleReady, manualDoubleRandom = doubleReadyRandom
+        expect(manualDouble.jump() && !manualDouble.jump(), "A manual second jump must consume the remaining jump")
+        let afterManualDouble = advance(&manualDouble, random: &manualDoubleRandom, seconds: 3)
+        expect(afterManualDouble.doubleJumps.isEmpty && manualDouble.onGround && manualDouble.jumpsUsed == 0,
+               "A manual second jump must replace the planned automatic boost and land normally")
 
         for action in [CharacterAction.jump, .portal] {
             let (ready, readyRandom) = due(action)
@@ -225,6 +334,6 @@ enum RoamingTests {
         expect(tiny.portals.isEmpty && tiny.jumps.count > 5 && tiny.landings > 5,
                "A narrow desktop must skip useless portals while keeping jumps and landings working")
 
-        print("Passed \(checks) free-roam checks: autonomous high jumps, portals, cooldowns, hover, focus, naps, drag/throw recovery, manual actions, refresh rates, and monitor geometry.")
+        print("Passed \(checks) free-roam checks: directional single/double jumps, portals, cooldowns, hover, focus, naps, drag/throw recovery, manual actions, refresh rates, and monitor geometry.")
     }
 }
