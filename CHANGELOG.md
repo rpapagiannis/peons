@@ -4,6 +4,8 @@ After CI passes on `main`, the release workflow advances the build number and mo
 
 ## Unreleased
 
+## 4.2.2 (build 10)
+
 - Rick now makes occasional high jumps and opens portals to clearly separated floor destinations while roaming freely, including across monitors.
 - Autonomous actions wait for throws and landings, pause for hovering and interaction, and leave room to catch Rick before resuming. Existing voice and chatter preferences still apply.
 - Deterministic regression coverage for free-roam behavior, interruption, cooldowns, and desktop geometry.
