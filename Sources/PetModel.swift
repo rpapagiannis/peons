@@ -30,6 +30,9 @@ struct PetModel {
     var nextDecision = 0.0
     var roamDirection: CGFloat = 1
     var isResting = false
+    private var roamingJumpDelay: Double?
+    private var roamingPortalDelay: Double?
+    private var roamingActionDelay = 1.0
     private(set) var isDragging = false
     private(set) var isThrown = false
     private(set) var jumpsUsed = 0
@@ -147,6 +150,12 @@ struct PetModel {
         if value == .paused { velocity.dx = 0; jumpPreparation = 0 }
         isResting = false
         nextDecision = age + 1
+        resetRoamingActions()
+    }
+    private mutating func resetRoamingActions() {
+        roamingJumpDelay = nil
+        roamingPortalDelay = nil
+        roamingActionDelay = 1
     }
     mutating func pressKey(_ key: UInt16) {
         if !keys.contains(key) { minimumKeyTime[key] = age + 0.055 }
@@ -171,6 +180,8 @@ struct PetModel {
         jumpsUsed += 1
         landingTime = 0
         isThrown = false
+        roamingJumpDelay = nil
+        roamingActionDelay = 2
         if onGround { jumpPreparation = 0.10 }
         else { velocity.dy = jumpImpulse }
         return true
@@ -186,6 +197,7 @@ struct PetModel {
         isThrown = false
         jumpPreparation = 0
         jumpsUsed = 0
+        resetRoamingActions()
         return true
     }
 
@@ -195,6 +207,7 @@ struct PetModel {
         jumpPreparation = 0
         portalTime = 0
         portalDestination = nil
+        resetRoamingActions()
         dragTarget = position
         dragSamples = [(start ?? position, time)]
     }
@@ -258,7 +271,66 @@ struct PetModel {
         }
     }
 
+    private func roamingPortalDestination<R: RandomNumberGenerator>(using random: inout R) -> CGPoint? {
+        // Exclude nearby floor so a portal always takes Rick somewhere visibly different.
+        let separation = max(120, size.width * 1.5)
+        let frames = surfaces.isEmpty ? [bounds] : surfaces.map(\.visibleFrame)
+        var destinations: [(x: ClosedRange<CGFloat>, y: CGFloat)] = []
+        for frame in frames {
+            let inset = min(size.width / 2, frame.width / 2)
+            let left = frame.minX + inset, right = frame.maxX - inset
+            let leftEnd = min(right, position.x - separation)
+            let rightStart = max(left, position.x + separation)
+            if left <= leftEnd { destinations.append((left...leftEnd, frame.midY)) }
+            if rightStart <= right { destinations.append((rightStart...right, frame.midY)) }
+        }
+        guard let range = destinations.randomElement(using: &random) else { return nil }
+        var destination = groundDestination(near: CGPoint(x: CGFloat.random(in: range.x, using: &random), y: range.y))
+        // Snapping from an upper display can change the floor display and clamp x again.
+        // Require a stable point so portal setup and arrival cannot shorten the trip.
+        for _ in 0...surfaces.count {
+            let snapped = groundDestination(near: destination)
+            if snapped == destination {
+                return abs(destination.x - position.x) >= separation ? destination : nil
+            }
+            destination = snapped
+        }
+        return nil
+    }
+
+    private mutating func updateRoamingActions<R: RandomNumberGenerator>(_ dt: Double, using random: inout R) {
+        guard mode == .roaming else { return }
+        if isHovered { roamingActionDelay = max(roamingActionDelay, 1); return }
+        guard onGround, !isThrown, jumpPreparation == 0, landingTime == 0 else { return }
+        // Count only unoccupied time on the floor, so hovering, throws and focus changes
+        // cannot build up a burst of overdue actions. Portals take priority if both are due.
+        roamingActionDelay = max(0, roamingActionDelay - dt)
+        guard roamingActionDelay == 0 else { return }
+        roamingJumpDelay = (roamingJumpDelay ?? Double.random(in: 8...16, using: &random)) - dt
+        roamingPortalDelay = (roamingPortalDelay ?? Double.random(in: 25...45, using: &random)) - dt
+        if let delay = roamingPortalDelay, delay <= 0 {
+            if let destination = roamingPortalDestination(using: &random), portal(to: destination) {
+                isResting = false
+                frontLocked = false
+                nextDecision = age + 2
+                return
+            }
+            // A narrow desktop or floor snapping can leave no useful trip. Keep walking and jumping.
+            roamingPortalDelay = Double.random(in: 25...45, using: &random)
+        }
+        if let delay = roamingJumpDelay, delay <= 0, jump() {
+            isResting = false
+            frontLocked = false
+            nextDecision = age + 2
+        }
+    }
+
     mutating func step(_ delta: Double) {
+        var random = SystemRandomNumberGenerator()
+        step(delta, using: &random)
+    }
+
+    mutating func step<R: RandomNumberGenerator>(_ delta: Double, using random: inout R) {
         let dt = min(max(delta, 0), 0.05)
         guard dt > 0 else { return }
         age += dt
@@ -275,6 +347,8 @@ struct PetModel {
             return
         }
         if isDragging { followDrag(dt); idleTime = 0; return }
+        updateRoamingActions(dt, using: &random)
+        if portalTime > 0 { return }
         if jumpPreparation > 0 {
             jumpPreparation = max(0, jumpPreparation - dt)
             if jumpPreparation < 0.0001 { jumpPreparation = 0; velocity.dy = jumpImpulse }
@@ -289,11 +363,11 @@ struct PetModel {
             if held.contains(2) || held.contains(124) { direction += 1 }
             if held.contains(56) || held.contains(60) { actualSpeed *= 2 }
         } else if mode == .roaming && onGround && !isThrown {
-            if age >= nextDecision {
-                isResting = Double.random(in: 0...1) < 0.24
-                roamDirection = Bool.random() ? 1 : -1
+            if age >= nextDecision && !isHovered && jumpPreparation == 0 {
+                isResting = Double.random(in: 0...1, using: &random) < 0.24
+                roamDirection = Bool.random(using: &random) ? 1 : -1
                 frontLocked = false
-                nextDecision = age + (isResting ? Double.random(in: 1.5...3.5) : Double.random(in: 2.8...6))
+                nextDecision = age + (isResting ? Double.random(in: 1.5...3.5, using: &random) : Double.random(in: 2.8...6, using: &random))
             }
             if !isResting && !isHovered { direction = roamDirection }
             actualSpeed *= 0.32

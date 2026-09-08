@@ -68,7 +68,7 @@ enum ModelTests {
         var fall = controlled(); fall.position.y = 500; advance(&fall, 2)
         expect(fall.onGround && !fall.isWalking, "An unsupported pet must fall, never stand in midair")
         var roaming = controlled(); roaming.setMode(.roaming); roaming.nextDecision = 100; advance(&roaming, 1)
-        expect(roaming.onGround && roaming.position.x > 530, "Autonomous roaming must stay on the floor")
+        expect(roaming.onGround && roaming.position.x > 530, "Free-roam walking must follow the floor between autonomous actions")
         var hover = controlled(); hover.setMode(.roaming); hover.isHovered = true; advance(&hover, 0.5)
         expect(hover.position.x == 500, "Hovering a grounded roaming pet should make him easy to catch")
         hover.position.y = 300; advance(&hover, 0.1)

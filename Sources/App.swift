@@ -508,7 +508,7 @@ struct ControlRoom: View {
                 VStack(alignment:.leading,spacing:10) {
                     Text(owner.selectedCharacter.name).font(.system(size:24,weight:.bold,design:.rounded)).foregroundColor(cream)
                     Text(owner.selectedCharacter.collection).font(.system(size:12)).foregroundColor(.white.opacity(0.45))
-                    Text("Let him wander, take control,\nor pick him up and throw him.")
+                    Text("He wanders, jumps, and opens portals.\nJoin in or pick him up and throw him.")
                         .font(.system(size:13)).lineSpacing(4).foregroundColor(.white.opacity(0.65))
                     Text("TINY · WALKS")
                         .font(.system(size:10,weight:.semibold,design:.monospaced)).foregroundColor(accent)

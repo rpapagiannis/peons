@@ -48,6 +48,8 @@ Tiny is the only size (135.68 × 180.2 screen points for the transparent canvas)
 
 Open **Peons.app** in your Applications folder. Click Rick to play; click another app or press Escape to return to roaming. The pickle icon in the menu bar opens the menu. The controls window shows Rick and the voice controls, with no character or size selector.
 
+In free roam, Rick mixes walking and resting with occasional high jumps and rarer portal trips to a different spot, including other connected monitors. He waits between actions and lets throws and landings finish first. Hover over him to keep him easy to catch; autonomous actions pause while you interact with him, open his menu, or put him down for a nap. Voices continue to follow the existing occasional-chatter setting.
+
 | Control | Action |
 | --- | --- |
 | Click Rick | Take keyboard control |
