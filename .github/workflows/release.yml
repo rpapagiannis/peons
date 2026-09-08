@@ -1,0 +1,132 @@
+name: Release
+
+# Publishing: push a tag named v<CFBundleShortVersionString>-<CFBundleVersion>, for example v4.2.2-9,
+# after committing the matching numbers in build.sh. The job builds, tests, packages, and publishes
+# the DMG with its checksum. If a release for that tag already exists (for example one created by
+# hand from a local DMG), its assets are left untouched and only the Homebrew cask is brought up to date.
+#
+# Dry run: trigger the workflow manually from the Actions tab. That builds, tests, and packages on the
+# runner and uploads the DMG as a workflow artifact without tagging or publishing anything.
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Build, test, package, publish
+    runs-on: macos-15
+    env:
+      GH_TOKEN: ${{ github.token }}
+      DRY_RUN: ${{ github.event_name == 'workflow_dispatch' }}
+      # Optional: a fine-grained token with contents read/write on <owner>/homebrew-peons.
+      # When present, the cask's version, sha256, and download URL are updated automatically.
+      TAP_TOKEN: ${{ secrets.HOMEBREW_TAP_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Read the version and build from build.sh
+        run: |
+          version=$(sed -n 's|.*<key>CFBundleShortVersionString</key><string>\([^<]*\)</string>.*|\1|p' build.sh)
+          build=$(sed -n 's|.*<key>CFBundleVersion</key><string>\([^<]*\)</string>.*|\1|p' build.sh)
+          if [[ -z "$version" || -z "$build" ]]; then
+            echo "::error::Could not read CFBundleShortVersionString and CFBundleVersion from build.sh"
+            exit 1
+          fi
+          if [[ "$DRY_RUN" != "true" && "$GITHUB_REF_NAME" != "v${version}-${build}" ]]; then
+            echo "::error::Tag $GITHUB_REF_NAME does not match build.sh, which expects v${version}-${build}"
+            exit 1
+          fi
+          { echo "VERSION=$version"; echo "BUILD=$build"; } >> "$GITHUB_ENV"
+
+      - name: Check for an existing release
+        id: existing
+        if: env.DRY_RUN != 'true'
+        run: |
+          if gh release view "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" >/dev/null 2>view-error.txt; then
+            echo "A release for $GITHUB_REF_NAME already exists; its assets will not be replaced."
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "No release for $GITHUB_REF_NAME yet. gh said: $(cat view-error.txt)"
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Build
+        if: env.DRY_RUN == 'true' || steps.existing.outputs.exists == 'false'
+        run: ./build.sh
+
+      - name: Test
+        if: env.DRY_RUN == 'true' || steps.existing.outputs.exists == 'false'
+        run: ./test.sh
+
+      - name: Package
+        if: env.DRY_RUN == 'true' || steps.existing.outputs.exists == 'false'
+        run: |
+          ./scripts/package_release.sh
+          dmg=$(ls dist/*.dmg)
+          { echo "DMG=$dmg"; echo "SHA256=$(cut -d' ' -f1 "$dmg.sha256")"; } >> "$GITHUB_ENV"
+
+      - name: Upload the dry-run DMG as a workflow artifact
+        if: env.DRY_RUN == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: peons-dmg-dry-run
+          path: dist/
+
+      - name: Publish GitHub release
+        if: env.DRY_RUN != 'true' && steps.existing.outputs.exists == 'false'
+        run: |
+          cat > notes.md <<EOF
+          ## Install
+          1. Download \`$(basename "$DMG")\` below.
+          2. Open the disk image and drag **Peons.app** onto **Applications**.
+          3. First launch: this preview is ad-hoc signed, so macOS blocks it with a warning that it cannot verify the app, or that the app is damaged. Open **System Settings → Privacy & Security** and click **Open Anyway** next to Peons. On macOS 14, Control-click the app and choose **Open**. If macOS insists the app is damaged, run \`xattr -d com.apple.quarantine /Applications/Peons.app\` and launch again.
+
+          Requires an Apple Silicon Mac running macOS 14 or later.
+
+          Homebrew: \`brew install --cask ${GITHUB_REPOSITORY_OWNER}/peons/peons\`
+
+          ## Verify
+          SHA-256: \`$SHA256\`
+          EOF
+          # Append this version's section from CHANGELOG.md when there is one.
+          awk -v heading="## ${VERSION} (build ${BUILD})" '
+            $0 == heading { printing = 1; print ""; print "## Changes"; next }
+            printing && /^## / { exit }
+            printing { print }
+          ' CHANGELOG.md >> notes.md
+          gh release create "$GITHUB_REF_NAME" "$DMG" "$DMG.sha256" \
+            --repo "$GITHUB_REPOSITORY" --title "Peons $VERSION (build $BUILD)" \
+            --notes-file notes.md --generate-notes
+
+      - name: Read the checksum of the already published DMG
+        if: env.DRY_RUN != 'true' && steps.existing.outputs.exists == 'true' && env.TAP_TOKEN != ''
+        run: |
+          gh release download "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" --pattern '*.sha256' --dir sidecar
+          sidecar=$(ls sidecar/*.sha256)
+          { echo "DMG=${sidecar%.sha256}"; echo "SHA256=$(cut -d' ' -f1 "$sidecar")"; } >> "$GITHUB_ENV"
+
+      - name: Update Homebrew tap
+        if: env.DRY_RUN != 'true' && env.TAP_TOKEN != ''
+        run: |
+          asset=$(basename "$DMG")
+          # Keep the cask's URL in step with the real asset name, including the day the -preview suffix goes away.
+          pattern=${asset//"${VERSION}-${BUILD}"/'#{version.csv.first}-#{version.csv.second}'}
+          git clone --depth 1 "https://x-access-token:${TAP_TOKEN}@github.com/${GITHUB_REPOSITORY_OWNER}/homebrew-peons.git" tap
+          sed -i '' \
+            -e "s|^  version \".*\"|  version \"${VERSION},${BUILD}\"|" \
+            -e "s|^  sha256 \".*\"|  sha256 \"${SHA256}\"|" \
+            -e "s|^  url \".*\"|  url \"https://github.com/${GITHUB_REPOSITORY_OWNER}/peons/releases/download/v#{version.csv.first}-#{version.csv.second}/${pattern}\"|" \
+            tap/Casks/peons.rb
+          cd tap
+          if git diff --quiet; then
+            echo "Cask already matches ${VERSION},${BUILD} and ${SHA256}; nothing to push."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -am "peons ${VERSION} (build ${BUILD})"
+          git push

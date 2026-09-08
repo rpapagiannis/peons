@@ -1,13 +1,25 @@
-# Template only. Replace every @...@ field using the final, notarized release.
-# Save as Casks/peons.rb in your Homebrew tap after configuration.
+# Template only. The live cask is Casks/peons.rb in the rpapagiannis/homebrew-peons tap;
+# the release workflow rewrites its version and sha256 lines when HOMEBREW_TAP_TOKEN is set.
+# Replace every @...@ field from the published GitHub release when updating by hand.
 cask "peons" do
-  version "@VERSION@"
+  version "@VERSION@,@BUILD@"
   sha256 "@SHA256@"
 
-  url "@DOWNLOAD_URL@"
+  url "https://github.com/rpapagiannis/peons/releases/download/v#{version.csv.first}-#{version.csv.second}/Peons-#{version.csv.first}-#{version.csv.second}-arm64-preview.dmg"
   name "Peons"
-  desc "Tiny desktop companion with movement and recorded voice lines"
-  homepage "@HOMEPAGE@"
+  desc "Desktop companion: Rat Suit Rick walks, jumps, and talks across your monitors"
+  homepage "https://github.com/rpapagiannis/peons"
+
+  livecheck do
+    url :url
+    regex(/^v?(\d+(?:\.\d+)+)-(\d+)$/i)
+    strategy :github_latest do |json, regex|
+      match = json["tag_name"]&.match(regex)
+      next if match.blank?
+
+      "#{match[1]},#{match[2]}"
+    end
+  end
 
   depends_on macos: :sonoma
   depends_on arch: :arm64
@@ -15,4 +27,6 @@ cask "peons" do
   app "Peons.app"
 
   uninstall quit: "local.rafail.pickle-rick-pet"
+
+  zap trash: "~/Library/Preferences/local.rafail.pickle-rick-pet.plist"
 end

@@ -63,8 +63,17 @@ mkdir "$staging/content"
 /usr/bin/ditto "$app" "$staging/content/Peons.app"
 /usr/bin/codesign --verify --deep --strict "$staging/content/Peons.app"
 ln -s /Applications "$staging/content/Applications"
-/usr/bin/hdiutil create -fs HFS+ -format UDZO -volname "Peons" \
-    -srcfolder "$staging/content" "$staging/$filename"
+# GitHub-hosted macOS runners occasionally fail hdiutil create with "Resource busy"; retry briefly.
+for attempt in 1 2 3 4 5; do
+    if /usr/bin/hdiutil create -fs HFS+ -format UDZO -volname "Peons" \
+        -srcfolder "$staging/content" "$staging/$filename"; then
+        break
+    fi
+    (( attempt < 5 )) || { print -u2 "hdiutil create failed after $attempt attempts."; exit 1; }
+    print -u2 "hdiutil create failed (attempt $attempt); retrying."
+    rm -f "$staging/$filename"
+    sleep 3
+done
 /usr/bin/hdiutil verify -quiet "$staging/$filename"
 (cd "$staging" && /usr/bin/shasum -a 256 "$filename" > "$filename.sha256")
 # Hard links publish without replacing an existing artifact, including concurrent invocations.

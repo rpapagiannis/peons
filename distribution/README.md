@@ -8,16 +8,29 @@ The app is native Swift/AppKit/SwiftUI and currently builds only for Apple Silic
 
 Offer one versioned DMG through a download page or GitHub Releases, with the app and an Applications shortcut. Users drag the app into Applications and launch it. A Homebrew cask can download and install the same DMG. A `.pkg` installer is unnecessary for this self-contained app, which has no services or system components to install.
 
-Maintain the cask in an owner-controlled Homebrew tap, such as a GitHub repository named `homebrew-peons`. This does not require admission to Homebrew's central cask repository. After it is configured and published, the install command would be:
+The cask lives in the owner-controlled tap [rpapagiannis/homebrew-peons](https://github.com/rpapagiannis/homebrew-peons) as `Casks/peons.rb`. This does not require admission to Homebrew's central cask repository. The install command is:
 
 ```sh
-# Example only: replace GITHUB_OWNER with the actual published tap owner.
-brew install --cask GITHUB_OWNER/peons/peons
+brew install --cask rpapagiannis/peons/peons
 ```
+
+On Homebrew 6, installing by the fully qualified name trusts only this cask, so users need no separate `brew tap` or `brew trust` step. To validate the cask locally before pushing, note that `brew tap` refuses an untrusted local tap during its load check; instead clone the tap repository into `$(brew --repository)/Library/Taps/rpapagiannis/homebrew-peons`, run `brew trust rpapagiannis/peons`, then `brew style --cask rpapagiannis/peons/peons` and `brew audit --cask --strict rpapagiannis/peons/peons`, and finish with `brew untap rpapagiannis/peons` and `brew untrust rpapagiannis/peons`.
 
 The tap holds a small installation recipe with the version, exact download URL, SHA-256 checksum, and architecture/OS requirements. Homebrew users can upgrade with `brew upgrade --cask peons` once the recipe is updated for a release. Direct-download users download the next DMG and replace the app; an in-app updater is not implemented.
 
-See the official [tap guide](https://docs.brew.sh/How-to-Create-and-Maintain-a-Tap) and [cask format](https://docs.brew.sh/Cask-Cookbook). `peons.rb.in` is a template, not a published or installable cask. Fill every `@...@` field from the final release and save it as `Casks/peons.rb` in the chosen tap. The template intentionally preserves user preferences during uninstall; the legacy bundle identifier is shared with earlier local prototypes.
+See the official [tap guide](https://docs.brew.sh/How-to-Create-and-Maintain-a-Tap) and [cask format](https://docs.brew.sh/Cask-Cookbook). `peons.rb.in` here is the reference template for that cask; the live copy in the tap is what Homebrew installs. Its `version` is `<version>,<build>` and the download URL is derived from the matching `v<version>-<build>` release tag. `uninstall` only quits the app so preferences survive; `brew uninstall --zap` removes the preference file as well. The bundle identifier is the legacy one shared with earlier local prototypes.
+
+## Automated releases
+
+`.github/workflows/release.yml` runs on any pushed tag starting with `v`, on an Apple Silicon GitHub runner. It refuses tags that do not match the version and build in `build.sh`, then runs `build.sh`, `test.sh`, and `scripts/package_release.sh`, and publishes the DMG plus its `.sha256` sidecar as a GitHub release whose notes include install steps, the checksum, and the matching section of `CHANGELOG.md`. If a release for that tag already exists, for example one created by hand from a local DMG, its assets are never replaced by a CI build with a different checksum; the job then only reads the published `.sha256` and brings the cask up to date. The cask's download URL is rewritten from the real asset name, so the `-preview` suffix disappearing after Developer ID signing needs no manual edit.
+
+Before relying on tags, run the workflow once by hand from the Actions tab. That is a dry run: it builds, tests, and packages on the runner and uploads the DMG as a workflow artifact without tagging or publishing anything. GitHub-hosted macOS runners occasionally fail `hdiutil create` with a resource-busy error, which `package_release.sh` now retries.
+
+To release: bump `CFBundleShortVersionString` or `CFBundleVersion` in `build.sh`, commit, then `git tag v<version>-<build> && git push origin v<version>-<build>`.
+
+To have the workflow bump the cask automatically, create a fine-grained personal access token with contents read and write on `homebrew-peons` only, and store it as the `HOMEBREW_TAP_TOKEN` repository secret on `peons`. Without the secret, copy the new version and the SHA-256 from the release's sidecar into `Casks/peons.rb` by hand.
+
+`.github/workflows/ci.yml` builds and runs the full test suite on every push to `main` and every pull request.
 
 ## Build a local preview DMG
 
@@ -32,7 +45,7 @@ The packaging helper preserves the built app's signature and writes a versioned 
 ## Prepare a public release
 
 1. Establish redistribution permission for the bundled artwork and recordings, or use assets with suitable permissions. `assets/ATTRIBUTION.md` records Pocket Mortys game sprites and Rick and Morty recordings; it does not establish a redistribution license for the underlying material. Attribution and an upstream fan-pack license do not document that missing permission.
-2. Choose the owner/repository for release downloads and the Homebrew tap. Nothing has been published by the local packaging step.
+2. Release downloads live on the GitHub Releases page of `rpapagiannis/peons`, and the Homebrew tap is `rpapagiannis/homebrew-peons`. The local packaging step itself publishes nothing.
 3. Configure an Apple Developer ID Application certificate and notarization credentials. Apple's [Developer ID distribution](https://developer.apple.com/documentation/xcode/distributing-your-app-for-beta-testing-and-releases) is the supported route for distributing this native app outside the App Store. The current `build.sh` uses ad-hoc signing instead.
 4. Build and test the release; sign the app with Developer ID, the hardened runtime, and a secure timestamp. Submit for notarization and staple its ticket. Create the DMG from that finished app, then sign/notarize/staple the distribution image as appropriate using Apple's [notarization workflow](https://developer.apple.com/documentation/security/notarizing-macos-software-before-distribution).
 5. Compute the final DMG checksum only after all signing/stapling operations. If those changed a packaged DMG, regenerate its checksum sidecar. Test the actual browser-downloaded artifact on a clean supported Mac, with Gatekeeper enabled, including install, first launch, audio, quit, and replacement by a newer version.
