@@ -1,6 +1,7 @@
 #!/bin/zsh
 set -euo pipefail
 cd "${0:A:h}"
+PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s Tests -p 'test_release.py' -v
 mkdir -p build
 staging="$(mktemp -d "$PWD/build/.peons-tests.XXXXXX")"
 trap 'rm -rf "$staging"' EXIT
