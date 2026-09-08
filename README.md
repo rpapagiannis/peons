@@ -32,7 +32,7 @@ This is a one-time step per version and goes away once releases are Developer ID
 brew install --cask rpapagiannis/peons/peons
 ```
 
-The cask in [rpapagiannis/homebrew-peons](https://github.com/rpapagiannis/homebrew-peons) installs the same disk image, so the same first-launch approval applies. Adding `--no-quarantine` to the install command skips it by not marking the download as quarantined. Homebrew 6 trusts only this cask when it is installed by its fully qualified name, so no separate `brew tap` or `brew trust` step is needed. Update later with `brew upgrade --cask peons`.
+The cask in [rpapagiannis/homebrew-peons](https://github.com/rpapagiannis/homebrew-peons) installs the same disk image, so the same first-launch approval applies. Homebrew 6 has no option to skip quarantine, and because an ad-hoc signature changes with every build, Homebrew cannot carry the approval over to upgrades either, so each new version asks once. Homebrew 6 trusts only this cask when it is installed by its fully qualified name, so no separate `brew tap` or `brew trust` step is needed. Update later with `brew upgrade --cask peons`.
 
 ### Verify a download
 
