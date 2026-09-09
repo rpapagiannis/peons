@@ -174,6 +174,36 @@ enum AppConfigurationTests {
         shortcutView.keyDown(with: keyEvent())
         shortcutView.keyUp(with: keyEvent(.keyUp, flags: .command))
         expect(!shortcut.model.keys.contains(2), "Movement key-up must still release the key while Command is held")
-        print("Passed \(checks) app configuration checks: Tiny defaults, character selection and relaunch, retired preference migration, preserved voice/speed settings, menus, and modifier-aware keyboard input.")
+
+        // Exercise the real hosted view: its intrinsic size previously enlarged an
+        // 800-point window to 832 points even when only 780 points were available.
+        _ = NSApplication.shared
+        func scrollView(in view:NSView) -> NSScrollView? {
+            if let scroll=view as? NSScrollView { return scroll }
+            return view.subviews.compactMap { scrollView(in:$0) }.first
+        }
+        let screen=NSScreen.screens[0].visibleFrame
+        for height:CGFloat in [780,600,480] {
+            let available=CGRect(x:screen.minX,y:screen.minY,width:screen.width,height:min(height,screen.height))
+            let window=fresh.makeControlsWindow(in:available)
+            let content=window.contentView!
+            content.layoutSubtreeIfNeeded()
+            RunLoop.current.run(until:Date(timeIntervalSinceNow:0.05))
+            content.layoutSubtreeIfNeeded()
+            expect(available.contains(window.frame),"Hosting the controls must not enlarge the window beyond the available screen")
+            expect(window.styleMask.contains(.resizable),"The controls must allow a shorter window")
+            let scroll=scrollView(in:content)
+            expect(scroll != nil,"Controls that do not fit must remain reachable by scrolling")
+            if let scroll,let document=scroll.documentView {
+                let bottom=document.isFlipped ? document.bounds.maxY : document.bounds.minY
+                scroll.contentView.scroll(to:CGPoint(x:0,y:bottom))
+                scroll.reflectScrolledClipView(scroll.contentView)
+                let visible=document.visibleRect
+                expect(document.isFlipped ? visible.maxY>=document.bounds.maxY-1 : visible.minY<=document.bounds.minY+1,
+                       "Scrolling must reveal the end of the controls, including Hide and Quit")
+                expect(available.contains(window.frame),"Scrolling must not resize the window beyond the screen")
+            }
+        }
+        print("Passed \(checks) app configuration checks: Tiny defaults, character selection and relaunch, retired preference migration, preserved voice/speed settings, menus, modifier-aware keyboard input, and controls on short displays.")
     }
 }

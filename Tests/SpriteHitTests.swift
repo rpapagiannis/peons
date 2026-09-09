@@ -57,8 +57,12 @@ enum SpriteHitTests {
                 for y in stride(from:0,to:340,by:8) {
                     for x in stride(from:0,to:256,by:8) {
                         let alpha=bitmap.colorAt(x:x,y:y)!.alphaComponent
-                        let point=CGPoint(x:CGFloat(x)+0.5,y:CGFloat(y)+0.5)
+                        // Fractional pointer coordinates sample the same pixel as
+                        // the rendered bitmap, including sharp edges during turns.
+                        let point=CGPoint(x:CGFloat(x)+0.25,y:CGFloat(y)+0.75)
                         let hit=PetRenderer.contains(point,model:model,reducedMotion:reducedMotion)
+                        precondition(hit == (alpha>16.0/255),"\(model.character.name) \(label) disagrees with rendered alpha at \(point)")
+                        checks += 1
                         if alpha==0 {
                             precondition(!hit,"\(label) intercepts transparent pixel \(point)")
                             checks += 1

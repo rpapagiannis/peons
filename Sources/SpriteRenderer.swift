@@ -35,7 +35,22 @@ enum PetRenderer {
             dragging=model.isDragging;frontLocked=model.frontLocked
         }
     }
-    private static var hitMask: (pose:HitPose,bitmap:NSBitmapImageRep)?
+    private struct HitSurface {
+        let bitmap:NSBitmapImageRep
+        let graphics:NSGraphicsContext
+        init?(width:Int,height:Int) {
+            guard let bitmap=NSBitmapImageRep(bitmapDataPlanes:nil,pixelsWide:width,pixelsHigh:height,
+                    bitsPerSample:8,samplesPerPixel:4,hasAlpha:true,isPlanar:false,colorSpaceName:.deviceRGB,
+                    bytesPerRow:0,bitsPerPixel:0),let graphics=NSGraphicsContext(bitmapImageRep:bitmap) else { return nil }
+            self.bitmap=bitmap
+            let context=graphics.cgContext
+            context.translateBy(x:0,y:CGFloat(height));context.scaleBy(x:1,y:-1)
+            self.graphics=NSGraphicsContext(cgContext:context,flipped:true)
+        }
+    }
+    private static let pointSurface=HitSurface(width:1,height:1)
+    private static let canvasSurface=HitSurface(width:256,height:340)
+    private static var canvasHitPose:HitPose?
 
     static func ellipse(_ rect:NSRect,_ fill:NSColor,stroke:NSColor? = ink,width:CGFloat = 2.8) {
         let p=NSBezierPath(ovalIn:rect);fill.setFill();p.fill()
@@ -129,29 +144,30 @@ enum PetRenderer {
 
     static func contains(_ point:CGPoint,model:PetModel,reducedMotion:Bool=false) -> Bool {
         guard CGRect(x:0,y:0,width:256,height:340).contains(point),art(for:model.character).isLoaded else { return false }
+        let pixelArt=model.character.sprites.pixelArt
+        guard let surface=pixelArt ? canvasSurface : pointSurface else { return false }
         let pose=HitPose(model,reducedMotion:reducedMotion)
-        if hitMask?.pose != pose {
-            // Rasterize at the same canvas origin as drawing. Moving a nearest-neighbor
-            // image into a one-pixel context can round sharp edges differently during turns.
-            // Keep only the current pose's mask; repeated pointer checks reuse it.
-            guard let bitmap=NSBitmapImageRep(bitmapDataPlanes:nil,pixelsWide:256,pixelsHigh:340,
-                    bitsPerSample:8,samplesPerPixel:4,hasAlpha:true,isPlanar:false,colorSpaceName:.deviceRGB,
-                    bytesPerRow:0,bitsPerPixel:0),let graphics=NSGraphicsContext(bitmapImageRep:bitmap) else { return false }
-            let context=graphics.cgContext
+        if !pixelArt || canvasHitPose != pose {
+            // Smooth sprites need only one pixel. Nearest-neighbor edges round
+            // differently in a shifted or clipped context, so pixel art keeps the
+            // full canvas origin. Reuse both surfaces instead of allocating per tick.
+            let context=surface.graphics.cgContext
+            context.saveGState()
             NSGraphicsContext.saveGraphicsState()
-            defer { NSGraphicsContext.restoreGraphicsState() }
-            context.translateBy(x:0,y:340)
-            context.scaleBy(x:1,y:-1)
-            NSGraphicsContext.current=NSGraphicsContext(cgContext:context,flipped:true)
+            defer { NSGraphicsContext.restoreGraphicsState();context.restoreGState() }
+            context.clear(CGRect(x:0,y:0,width:surface.bitmap.pixelsWide,height:surface.bitmap.pixelsHigh))
+            if !pixelArt { context.translateBy(x:-floor(point.x),y:-floor(point.y)) }
+            NSGraphicsContext.current=surface.graphics
             draw(in:CGRect(x:0,y:0,width:256,height:340),character:model.character,phase:pose.phase,
                  walking:pose.walking,age:pose.age,jump:pose.jump,mode:pose.mode,portal:pose.portal,
                  reducedMotion:pose.reducedMotion,facing:pose.facing,anticipation:pose.anticipation,
                  landing:pose.landing,turn:pose.turn,idleTime:pose.idleTime,dragging:pose.dragging,
                  worldPositioned:true,frontLocked:pose.frontLocked,includeEffects:false)
-            hitMask=(pose,bitmap)
+            if pixelArt { canvasHitPose=pose }
         }
-        guard let bitmap=hitMask?.bitmap,let pixels=bitmap.bitmapData else { return false }
-        return pixels[Int(point.y)*bitmap.bytesPerRow+Int(point.x)*4+3]>16
+        guard let pixels=surface.bitmap.bitmapData else { return false }
+        let offset=pixelArt ? Int(point.y)*surface.bitmap.bytesPerRow+Int(point.x)*4 : 0
+        return pixels[offset+3]>16
     }
 
     static func drawPortal(_ ctx:CGContext,progress:CGFloat,age:Double) {

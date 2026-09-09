@@ -48,7 +48,7 @@ shasum -a 256 -c Peons-*.dmg.sha256
 
 Choose **Rat Suit Rick** or **Warcraft Peon** in the controls window or the menu's **Character** submenu. The selected character is remembered across launches. Tiny is the only size (135.68 × 180.2 screen points for the transparent canvas); each character keeps its own proportions. Unknown or retired character choices fall back to Rick, and old size choices migrate to Tiny.
 
-Open **Peons.app** in your Applications folder. Click your character to play; click another app or press Escape to return to roaming. The pickle icon in the menu bar opens the menu. The controls window shows both character choices, an animated preview, and sound controls. Switching preserves position, movement, jumps, throws, naps, and portal travel, while replacing the previous recording with the selected character's next line.
+Open **Peons.app** in your Applications folder. Click your character to play; click another app or press Escape to return to roaming. The pickle icon in the menu bar opens the menu. The controls window shows both character choices, an animated preview, and sound controls; it can be resized vertically and scrolls on shorter displays. Switching preserves position, movement, jumps, throws, naps, and portal travel, while replacing the previous recording with the selected character's next line.
 
 Warcraft Peon uses the original Warcraft II pixel sprites and all 17 English Warcraft III recordings from Peon Ping. Rick retains his 17 recordings. Each character advances through its own complete voice cycle and resumes where it left off when selected again. Both packs use the same volume, mute, and occasional-chatter settings.
 

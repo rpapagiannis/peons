@@ -7,6 +7,8 @@ After CI passes on `main`, the release workflow advances the build number and mo
 - Add Warcraft Peon as the second character, using the original Warcraft II sprites and all 17 English Warcraft III recordings from Peon Ping, balanced to the existing sound levels.
 - Choose Rick or Peon in the controls window or Character menu. Selection persists across launches, with independent voice cycles and preserved movement, jumps, throws, naps, and portal travel.
 - Support character-specific sprite layouts, walk sequences, proportions, and crisp pixel rendering; verify both characters' floor alignment, transparent hit areas, and bundled audio.
+- Keep controls within the available screen height, with vertical resizing and scrolling on shorter displays.
+- Reuse hit-test drawing surfaces and sample smooth sprites one pixel at a time, retaining full-canvas precision for pixel art.
 
 ## 4.2.2 (build 13)
 

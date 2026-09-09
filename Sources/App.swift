@@ -455,17 +455,29 @@ final class PetController: NSObject, NSApplicationDelegate, NSWindowDelegate, NS
 
     @objc func showControls() {
         if let controlWindow { controlWindow.makeKeyAndOrderFront(nil);NSApp.activate();return }
-        let window=NSWindow(contentRect:NSRect(x:0,y:0,width:620,height:800),styleMask:[.titled,.closable,.miniaturizable,.fullSizeContentView],backing:.buffered,defer:false)
+        let window=makeControlsWindow(in:screenAtMouse().visibleFrame)
+        controlWindow=window
+        window.makeKeyAndOrderFront(nil)
+        NSApp.activate()
+    }
+
+    func makeControlsWindow(in visibleFrame:CGRect) -> NSWindow {
+        let size=NSSize(width:620,height:min(832,visibleFrame.height))
+        let frame=NSRect(x:visibleFrame.midX-size.width/2,y:visibleFrame.midY-size.height/2,width:size.width,height:size.height)
+        let window=NSWindow(contentRect:frame,styleMask:[.titled,.closable,.miniaturizable,.resizable,.fullSizeContentView],backing:.buffered,defer:false)
         window.title="Peons · \(selectedCharacter.shortName) controls"
         window.titlebarAppearsTransparent=true
         window.titleVisibility = .hidden
         window.backgroundColor=NSColor(hex:0x17191f)
         window.isReleasedWhenClosed=false
         window.delegate=self
-        window.contentView=NSHostingView(rootView:ControlRoom(owner:self))
-        window.center();window.makeKeyAndOrderFront(nil)
-        controlWindow=window
-        NSApp.activate()
+        let content=NSHostingView(rootView:ControlRoom(owner:self))
+        // The scroll view owns overflow; its ideal height must not enlarge the window.
+        content.sizingOptions=[]
+        window.contentView=content
+        window.minSize=NSSize(width:620,height:min(360,visibleFrame.height))
+        window.maxSize=NSSize(width:620,height:832)
+        return window
     }
 
     func menuIcon() -> NSImage {
@@ -543,6 +555,7 @@ struct ControlRoom: View {
         ? Color(red:0.94,green:0.71,blue:0.37) : Color(red:0.77,green:0.71,blue:0.99) }
     let cream=Color(red:0.94,green:0.94,blue:0.90)
     var body: some View {
+        ScrollView(.vertical) {
         VStack(alignment:.leading,spacing:0) {
             HStack {
                 Text("PEONS")
@@ -612,8 +625,8 @@ struct ControlRoom: View {
                 Text("·").foregroundColor(.white.opacity(0.2))
                 Button("Quit") { owner.quit() }.buttonStyle(.plain)
             }.font(.system(size:10)).foregroundColor(.white.opacity(0.5)).padding(.top,18)
-            Spacer(minLength:20)
-        }.padding(.horizontal,30).frame(width:620,height:800).background(Color(red:0.075,green:0.08,blue:0.10)).preferredColorScheme(.dark)
+        }.padding(.horizontal,30).padding(.bottom,20).frame(width:620)
+        }.background(Color(red:0.075,green:0.08,blue:0.10)).preferredColorScheme(.dark)
     }
     func key(_ title:String,_ description:String)->some View {
         HStack(spacing:7) {
