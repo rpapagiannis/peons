@@ -134,17 +134,37 @@ enum ModelTests {
         advance(&lowFPS, 0.5, fps: 30); advance(&highFPS, 0.5, fps: 120)
         expect(abs(lowFPS.jumpHeight - highFPS.jumpHeight) < 20, "Jump height must remain consistent across frame rates")
 
-        expect(CharacterCatalog.all.map(\.id) == ["rat-suit-rick"],"Rat Suit Rick must be the only available character")
+        expect(CharacterCatalog.all.map(\.id) == ["rat-suit-rick","peon"],"Rick and Warcraft Peon must be the two available characters")
         expect(CharacterCatalog.defaultCharacter.id == "rat-suit-rick","A fresh pet must use Rat Suit Rick")
         let freshPet = PetModel()
         expect(abs(freshPet.size.width - 135.68) < 0.000001 && abs(freshPet.size.height - 180.2) < 0.000001,"A fresh model must use Tiny at scale 0.53")
         expect(CharacterCatalog.resolve(nil) == CharacterCatalog.defaultCharacter,"Missing saved characters must use the default")
         expect(CharacterCatalog.resolve("unknown") == CharacterCatalog.defaultCharacter,"Unknown saved characters must fall back safely")
-        for id in ["pickle-rick", "peon", "glados", "sc_tank"] {
+        for id in ["pickle-rick", "glados", "sc_tank"] {
             expect(CharacterCatalog.resolve(id).id == "rat-suit-rick","Retired selection \(id) must resolve to Rat Suit Rick")
         }
         for character in CharacterCatalog.all {
             expect(CharacterCatalog.resolve(character.id) == character,"Every available character must survive a saved-selection round trip")
+            var switching=controlled();switching.pressKey(2);switching.jump();advance(&switching,0.2)
+            let airborne=switching
+            switching.selectCharacter(character)
+            expect(switching.position == airborne.position && switching.velocity == airborne.velocity && switching.jumpsUsed == airborne.jumpsUsed && switching.keys == airborne.keys,
+                   "Character switching mid-jump must retain position, momentum, jumps, and input")
+            switching.pressKey(1);switching.selectCharacter(character)
+            expect(switching.frontLocked && switching.facing == .front,"Character switching must preserve the Down-facing lock")
+            switching.beginDrag(at:0);switching.drag(to:CGPoint(x:750,y:350),at:0.02)
+            switching.selectCharacter(character)
+            expect(switching.isDragging,"A character switch must retain the active drag")
+            switching.endDrag(at:0.021)
+            let thrown=switching;switching.selectCharacter(character)
+            expect(switching.isThrown && switching.velocity == thrown.velocity && switching.lastThrowVelocity == thrown.lastThrowVelocity,
+                   "A character switch must retain a throw's momentum")
+            var traveling=controlled();traveling.portal(to:CGPoint(x:800,y:0));advance(&traveling,0.15)
+            let portalBefore=traveling;traveling.selectCharacter(character)
+            expect(traveling.portalTime == portalBefore.portalTime && traveling.portalDestination == portalBefore.portalDestination && traveling.portalOpenCount == 1,
+                   "Character switching must preserve an active portal and its destination")
+            traveling.setMode(.paused);traveling.selectCharacter(character)
+            expect(traveling.mode == .paused,"Selecting a character must not wake a sleeping pet")
         }
         let displays=[DesktopSurface(frame:CGRect(x:0,y:0,width:1000,height:800)),DesktopSurface(frame:CGRect(x:1000,y:0,width:1200,height:1000))]
         do {

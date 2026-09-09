@@ -42,6 +42,21 @@ import AVFAudio
         let supplementalIDs:Set<String>=["pickle_rick","i_turned_myself_into_a_pickle","hey_morty"]
         precondition(!officialIDs.isEmpty && Set(character.lines.map(\.id)) == officialIDs.union(supplementalIDs),
                      "Rick's complete official manifest and the three selected Pickle Rick clips must be present")
+        let peon=CharacterCatalog.peon
+        let peonManifestURL=manifestURL.deletingLastPathComponent().deletingLastPathComponent().appendingPathComponent("peon/openpeon.json")
+        let peonManifest=try JSONSerialization.jsonObject(with:Data(contentsOf:peonManifestURL)) as! [String:Any]
+        let peonCategories=peonManifest["categories"] as! [String:[String:Any]]
+        let peonIDs=Set(peonCategories.values.flatMap { category in
+            (category["sounds"] as! [[String:Any]]).map { URL(fileURLWithPath:$0["file"] as! String).lastPathComponent }
+        })
+        precondition(peonIDs.count == 17 && Set(peon.lines.map(\.id)) == peonIDs,"The complete official Peon Ping pack must be available")
+        var switching=DialogueDirector()
+        for index in 0..<40 {
+            precondition(switching.next(character:character,action:.select,now:Double(index)) == character.lines[index%character.lines.count])
+            switching.reset(now:Double(index))
+            precondition(switching.next(character:peon,action:.select,now:Double(index)) == peon.lines[index%peon.lines.count],
+                         "Character switching must preserve separate complete voice cycles")
+        }
         var timing=DialogueDirector()
         precondition(timing.next(character:character,action:.greet,now:0)==character.lines[0])
         timing.occupy(until:90,now:0)
@@ -93,6 +108,8 @@ import AVFAudio
                          "An effect must replace the voice and clear its diagnostic ID")
             precondition(sound.play(character.lines[1],volume:0)>0 && sound.playingLineID == character.lines[1].id && sound.playingEffectID == nil,
                          "A voice must replace the effect and clear its diagnostic ID")
+            precondition(sound.play(peon.lines[0],volume:0)>0 && sound.playingLineID == peon.lines[0].id && sound.playingEffectID == nil,
+                         "Peon's WAV must replace Rick on the same player")
             precondition(sound.play(CharacterLine("missing","Missing",audio:"missing.wav"),volume:0)==0 && !sound.isPlaying && sound.playingLineID == nil && sound.playingEffectID == nil,
                          "Missing audio must fail silently and leave no stale playback state")
             sound.play(.portalOpen,volume:0);sound.stop()
@@ -104,6 +121,6 @@ import AVFAudio
                          "A naturally finished effect must not remain active in diagnostics")
             print("Passed real audio playback at zero volume: voice/effect replacement, missing asset, stop, and natural completion.")
         }
-        print("Passed shipped Rick dialogue and manifest coverage, rapid input, cooldown/reset semantics, and \(assets.count) audio decodes.")
+        print("Passed both complete dialogue packs, independent character cycles, rapid input, cooldown/reset semantics, and \(assets.count) audio decodes.")
     }
 }

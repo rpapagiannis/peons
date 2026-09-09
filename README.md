@@ -6,7 +6,9 @@
 
 ![Rat Suit Rick walking along the floor, jumping, facing the viewer, and being thrown across the desktop](docs/demo.gif)
 
-A native macOS desktop companion featuring **Rat Suit Rick**. He walks, jumps, roams, and can be picked up and thrown across every connected monitor. No accounts, no network calls, and no special permissions.
+![Warcraft Peon walking, jumping, facing the viewer, and being thrown across the desktop](docs/peon-demo.gif)
+
+A native macOS desktop companion featuring **Rat Suit Rick** and **Warcraft Peon**. They walk, jump, roam, and can be picked up and thrown across every connected monitor. No accounts, no network calls, and no special permissions.
 
 ## Install
 
@@ -44,9 +46,11 @@ shasum -a 256 -c Peons-*.dmg.sha256
 
 ## Using Peons
 
-Tiny is the only size (135.68 × 180.2 screen points for the transparent canvas). Older saved character and size choices automatically migrate to Rat Suit Rick at Tiny size.
+Choose **Rat Suit Rick** or **Warcraft Peon** in the controls window or the menu's **Character** submenu. The selected character is remembered across launches. Tiny is the only size (135.68 × 180.2 screen points for the transparent canvas); each character keeps its own proportions. Unknown or retired character choices fall back to Rick, and old size choices migrate to Tiny.
 
-Open **Peons.app** in your Applications folder. Click Rick to play; click another app or press Escape to return to roaming. The pickle icon in the menu bar opens the menu. The controls window shows Rick and the sound controls, with no character or size selector.
+Open **Peons.app** in your Applications folder. Click your character to play; click another app or press Escape to return to roaming. The pickle icon in the menu bar opens the menu. The controls window shows both character choices, an animated preview, and sound controls; it can be resized vertically and scrolls on shorter displays. Switching preserves position, movement, jumps, throws, naps, and portal travel, while replacing the previous recording with the selected character's next line.
+
+Warcraft Peon uses the original Warcraft II pixel sprites and all 17 English Warcraft III recordings from Peon Ping. Rick retains his 17 recordings. Each character advances through its own complete voice cycle and resumes where it left off when selected again. Both packs use the same volume, mute, and occasional-chatter settings.
 
 In free roam, Rick mixes walking and resting with occasional high jumps and rarer portal trips to a different spot, including other connected monitors. About one in three jumps gets a second boost near the top, and every autonomous jump holds full left or right movement at the selected speed until landing. He waits between actions and lets throws and landings finish first. Hover over him to keep him easy to catch; autonomous actions pause while you interact with him, open his menu, or put him down for a nap. Voices continue to follow the existing occasional-chatter setting.
 
@@ -54,7 +58,7 @@ Each portal trip opens with the recorded Rick and Morty portal sound, including 
 
 | Control | Action |
 | --- | --- |
-| Click Rick | Take keyboard control |
+| Click your character | Take keyboard control |
 | A / D or Left / Right | Walk |
 | S or Down | Face the viewer |
 | Shift + movement | Move faster |
@@ -64,8 +68,8 @@ Each portal trip opens with the recorded Rick and Morty portal sound, including 
 | E | Play the next voice line |
 | M | Mute or unmute all sound |
 | Escape | Release keyboard control and roam |
-| Right-click Rick | Controls, speed, nap, sound, hide, summon, quit |
-| C or H while controlling | Open Rick controls |
+| Right-click your character | Character, controls, speed, nap, sound, hide, summon, quit |
+| C or H while controlling | Open character controls |
 
 All connected monitors form one desktop. Rick walks, jumps, or flies across internal monitor seams without bouncing or wrapping. Wrapping happens only beyond the far left and right edges of the combined desktop. Ground travel follows each monitor's usable bottom edge, stepping to the receiving floor when the monitors have different vertical offsets. The screen bottom is the only platform; application windows and boxes are not detected. Disconnecting a monitor brings Rick back onto a remaining screen.
 
@@ -85,7 +89,7 @@ open "build/Peons.app"
 
 For an additional real-player check on a Mac with audio output, run `./test.sh --audio-playback`. Playback uses zero volume. The default suite validates the audio files and controller behavior without requiring an output device.
 
-Builds produce a fresh `build/Peons.app` containing Rick's atlas, 17 voice recordings, and the portal effect, with a Rick app icon generated from that atlas. Only manifest-referenced, normalized audio is bundled. Build and test compiler caches are temporary and removed when each command exits. Retired characters, rolling animations, prototype renderers, and their assets have been removed from the source tree. Rebuilding does not install the bundle into Applications: replace the installed copy and restart it to use an updated build.
+Builds produce a fresh `build/Peons.app` containing both character sheets, 34 voice recordings, and the portal effect, with a Rick app icon generated from his atlas. Only manifest-referenced, normalized audio is bundled. Build and test compiler caches are temporary and removed when each command exits. Retired characters, rolling animations, prototype renderers, and their assets have been removed from the source tree. Rebuilding does not install the bundle into Applications: replace the installed copy and restart it to use an updated build.
 
 To package locally, run `./scripts/package_release.sh` after building; it writes `dist/Peons-<version>-<build>-arm64-preview.dmg` and its SHA-256 checksum. After a merge or push to `main` passes CI, GitHub Actions increments the build number, moves the unreleased changelog entries into that release, and builds and tests the versioned app. It then commits the release metadata, pushes the matching tag, publishes the DMG and checksum, and updates the Homebrew cask. Add changes under `## Unreleased` in `CHANGELOG.md`; edit the app version in `build.sh` only when a new major, minor, or patch version is wanted. Manual tag releases, dry runs, and cask repair remain available. See [distribution/README.md](distribution/README.md). Preview builds are ad-hoc signed; Developer ID signing and notarization are still to do, and the redistribution basis for the bundled artwork and recordings is recorded in [assets/ATTRIBUTION.md](assets/ATTRIBUTION.md).
 
@@ -96,18 +100,20 @@ Development exports:
 ```sh
 "build/Peons.app/Contents/MacOS/Peons" --render /absolute/preview.png
 "build/Peons.app/Contents/MacOS/Peons" --export-demo /absolute/preview.gif
+"build/Peons.app/Contents/MacOS/Peons" --character peon --render /absolute/peon.png
+"build/Peons.app/Contents/MacOS/Peons" --character peon --export-demo /absolute/peon.gif
 ```
 
 `--diagnostics /absolute/path.json` writes only this app's internal state and display geometry. It is disabled in normal launches. The legacy bundle identifier `local.rafail.pickle-rick-pet` and migration of saved character/size choices are retained for compatibility with earlier installations.
 
 The Rick voice selection and comparison are documented in `research/VOICE_PACKS.md`; the portal source and playback behavior are in `research/PORTAL_SOUND.md`. To reproduce all balanced sound files from the pinned original recordings, run `swift scripts/prepare_audio.swift`, then rebuild. This preparation step uses macOS audio decoding services and does not play audio.
 
-Artwork and sound provenance are in `assets/ATTRIBUTION.md`. This is an unofficial personal project; the character artwork belongs to its respective rights holders. The original atlas is bundled unmodified and existing poses are selected at runtime. Recorded voice clips play locally with matching speech bubbles.
+Artwork and sound provenance, including the pinned Peon Ping pack and Warcraft sprite coordinates, are in `assets/ATTRIBUTION.md`. This is an unofficial personal project; the character artwork belongs to its respective rights holders. Both original sheets are bundled unmodified and existing poses are selected at runtime. Recorded voice clips play locally with matching speech bubbles.
 
 ## Project layout
 
-- `Sources/` and `Tests/`: the current Rick app and its regression coverage.
-- `assets/`: the active sprite atlas, 17 normalized voices, the normalized portal effect, original recordings, and attribution.
+- `Sources/` and `Tests/`: the character catalog, shared desktop app, and regression coverage.
+- `assets/`: both sprite sheets, 34 normalized voices, the normalized portal effect, original recordings, and attribution.
 - `research/`: movement rationale and the pinned sound selection/provenance needed to reproduce the assets.
 - `scripts/` and `distribution/`: audio preparation, DMG packaging, the Homebrew cask template, and the release process notes.
 - `CHANGELOG.md`: what changed in each release; the release workflow copies the matching section into the GitHub release notes.

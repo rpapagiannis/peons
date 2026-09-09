@@ -19,7 +19,7 @@ cat > "$app/Contents/Info.plist" <<'PLIST'
     <key>CFBundleName</key><string>Peons</string>
     <key>CFBundleDisplayName</key><string>Peons</string>
     <key>CFBundlePackageType</key><string>APPL</string>
-    <key>CFBundleShortVersionString</key><string>4.2.2</string>
+    <key>CFBundleShortVersionString</key><string>4.3.0</string>
     <key>CFBundleVersion</key><string>13</string>
     <key>LSMinimumSystemVersion</key><string>14.0</string>
     <key>LSUIElement</key><true/>
@@ -28,6 +28,7 @@ cat > "$app/Contents/Info.plist" <<'PLIST'
 </dict></plist>
 PLIST
 cp assets/rat-suit-pickle-rick-atlas.png "$app/Contents/Resources/"
+cp assets/warcraft-peon-sheet.png "$app/Contents/Resources/"
 cp assets/ATTRIBUTION.md "$app/Contents/Resources/"
 # Copy only manifest-referenced voices/effects; original recordings stay in the source tree.
 python3 - "$app/Contents/Resources" <<'PYASSETS'
@@ -35,7 +36,7 @@ from pathlib import Path, PurePosixPath
 import json, shutil, sys
 source = Path("assets/sounds")
 destination = Path(sys.argv[1]) / "sounds"
-for directory, manifest in [("rick", "lines.json"), ("effects", "effects.json")]:
+for directory, manifest in [("rick", "lines.json"), ("peon", "lines.json"), ("effects", "effects.json")]:
     pack = source / directory
     for metadata in pack.glob("*.json"):
         target = destination / directory / metadata.name

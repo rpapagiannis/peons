@@ -139,7 +139,7 @@ final class PetController: NSObject, NSApplicationDelegate, NSWindowDelegate, NS
     var tickNumber = 0
     var accessibilityState = ""
     @Published var displayedMode: PetMode = .roaming
-    let selectedCharacter = CharacterCatalog.ratSuit
+    @Published private(set) var selectedCharacter = CharacterCatalog.defaultCharacter
     @Published var isHidden = false
     @Published var soundEnabled = true
     @Published var chatterEnabled = true
@@ -156,6 +156,7 @@ final class PetController: NSObject, NSApplicationDelegate, NSWindowDelegate, NS
         chatterEnabled=defaults.object(forKey:"chatterEnabled") as? Bool ?? true
         volume=min(1,max(0,defaults.object(forKey:"voiceVolume") as? Double ?? 0.5))
         model.speed = defaults.object(forKey:"speed") as? CGFloat ?? 150
+        selectedCharacter=CharacterCatalog.resolve(defaults.string(forKey:"character"))
         defaults.set(selectedCharacter.id,forKey:"character")
         defaults.removeObject(forKey:"size")
         model.selectCharacter(selectedCharacter)
@@ -194,7 +195,7 @@ final class PetController: NSObject, NSApplicationDelegate, NSWindowDelegate, NS
         statusItem = NSStatusBar.system.statusItem(withLength:NSStatusItem.variableLength)
         if let button = statusItem.button {
             button.image = menuIcon()
-            button.toolTip = "Peons — Rat Suit Rick controls"
+            button.toolTip = "Peons — \(selectedCharacter.name) controls"
             button.setAccessibilityLabel("Peons")
         }
         statusItem.menu = makeMenu()
@@ -298,6 +299,24 @@ final class PetController: NSObject, NSApplicationDelegate, NSWindowDelegate, NS
         dialogue.occupy(until:speechUntil+0.3,now:now)
     }
     func silence() { sound.stop();speech=nil;dialogue.reset(now:ProcessInfo.processInfo.systemUptime) }
+    func selectCharacter(_ character:CharacterDefinition) {
+        guard selectedCharacter != character else { return }
+        silence()
+        selectedCharacter=character
+        model.selectCharacter(character)
+        preferences.set(character.id,forKey:"character")
+        panel?.title="Peons — \(character.name)"
+        controlWindow?.title="Peons · \(character.shortName) controls"
+        petView?.setAccessibilityLabel("\(character.name). Click to control. Drag and release to throw. Right click for controls and options.")
+        statusItem?.button?.toolTip="Peons — \(character.name) controls"
+        placePanel()
+        say(.select)
+        writeDiagnostics()
+    }
+    @objc func chooseCharacter(_ sender:NSMenuItem) {
+        guard let id=sender.representedObject as? String else { return }
+        selectCharacter(CharacterCatalog.resolve(id))
+    }
     @objc func shout() { say(.shout,for:2.5) }
     @objc func toggleSound() {
         soundEnabled.toggle();preferences.set(soundEnabled,forKey:"soundEnabled")
@@ -351,7 +370,7 @@ final class PetController: NSObject, NSApplicationDelegate, NSWindowDelegate, NS
     }
     func handlePortalOpening(now:Double = ProcessInfo.processInfo.systemUptime) {
         guard model.portalOpenCount != handledPortalOpenCount else { return }
-        // Consume even muted/hidden openings; unmuting or showing Rick must not replay old cues.
+        // Consume even muted/hidden openings; unmuting or showing the pet must not replay old cues.
         handledPortalOpenCount=model.portalOpenCount
         guard model.portalTime > 0,!isHidden,model.mode != .paused else { return }
         sound.stop();speech=nil;speechUntil=0
@@ -404,14 +423,22 @@ final class PetController: NSObject, NSApplicationDelegate, NSWindowDelegate, NS
     func populate(_ menu: NSMenu) {
         menu.removeAllItems()
         let heading=item("PEONS",nil);heading.isEnabled=false;menu.addItem(heading)
-        menu.addItem(item("Rick controls…",#selector(showControls)))
+        menu.addItem(item("\(selectedCharacter.shortName) controls…",#selector(showControls)))
+        let characterMenu=NSMenu()
+        for character in CharacterCatalog.all {
+            let choice=item(character.name,#selector(chooseCharacter(_:)))
+            choice.representedObject=character.id
+            choice.state=character == selectedCharacter ? .on : .off
+            characterMenu.addItem(choice)
+        }
+        let characters=item("Character",nil);characters.submenu=characterMenu;menu.addItem(characters)
         menu.addItem(.separator())
         let take=item("Take control · WASD / arrows",#selector(takeControl));take.state=model.mode == .controlled ? .on : .off;menu.addItem(take)
         let roaming=item("Roam freely",#selector(roam));roaming.state=model.mode == .roaming ? .on : .off;menu.addItem(roaming)
         menu.addItem(item(model.mode == .paused ? "Wake up" : "Take a nap",#selector(togglePause)))
         menu.addItem(item("Jump!",#selector(jump)))
         menu.addItem(item("Open a portal",#selector(portal)))
-        menu.addItem(item("Bring Rick here",#selector(summon)))
+        menu.addItem(item("Bring \(selectedCharacter.shortName) here",#selector(summon)))
         menu.addItem(item("Shout · E",#selector(shout)))
         menu.addItem(.separator())
         let sound=item("Sound · M to mute",#selector(toggleSound));sound.state=soundEnabled ? .on : .off;menu.addItem(sound)
@@ -421,24 +448,36 @@ final class PetController: NSObject, NSApplicationDelegate, NSWindowDelegate, NS
             let choice=item(name,#selector(chooseSpeed(_:)));choice.tag=value;choice.state=Int(model.speed) == value ? .on : .off;speedMenu.addItem(choice)
         }
         let speeds=item("Speed",nil);speeds.submenu=speedMenu;menu.addItem(speeds)
-        menu.addItem(item(isHidden ? "Show Rick" : "Hide Rick",#selector(toggleHidden)))
+        menu.addItem(item("\(isHidden ? "Show" : "Hide") \(selectedCharacter.shortName)",#selector(toggleHidden)))
         menu.addItem(.separator())
         menu.addItem(item("Quit Peons",#selector(quit),key:"q"))
     }
 
     @objc func showControls() {
         if let controlWindow { controlWindow.makeKeyAndOrderFront(nil);NSApp.activate();return }
-        let window=NSWindow(contentRect:NSRect(x:0,y:0,width:620,height:748),styleMask:[.titled,.closable,.miniaturizable,.fullSizeContentView],backing:.buffered,defer:false)
-        window.title="Peons · Rick controls"
+        let window=makeControlsWindow(in:screenAtMouse().visibleFrame)
+        controlWindow=window
+        window.makeKeyAndOrderFront(nil)
+        NSApp.activate()
+    }
+
+    func makeControlsWindow(in visibleFrame:CGRect) -> NSWindow {
+        let size=NSSize(width:620,height:min(832,visibleFrame.height))
+        let frame=NSRect(x:visibleFrame.midX-size.width/2,y:visibleFrame.midY-size.height/2,width:size.width,height:size.height)
+        let window=NSWindow(contentRect:frame,styleMask:[.titled,.closable,.miniaturizable,.resizable,.fullSizeContentView],backing:.buffered,defer:false)
+        window.title="Peons · \(selectedCharacter.shortName) controls"
         window.titlebarAppearsTransparent=true
         window.titleVisibility = .hidden
         window.backgroundColor=NSColor(hex:0x17191f)
         window.isReleasedWhenClosed=false
         window.delegate=self
-        window.contentView=NSHostingView(rootView:ControlRoom(owner:self))
-        window.center();window.makeKeyAndOrderFront(nil)
-        controlWindow=window
-        NSApp.activate()
+        let content=NSHostingView(rootView:ControlRoom(owner:self))
+        // The scroll view owns overflow; its ideal height must not enlarge the window.
+        content.sizingOptions=[]
+        window.contentView=content
+        window.minSize=NSSize(width:620,height:min(360,visibleFrame.height))
+        window.maxSize=NSSize(width:620,height:832)
+        return window
     }
 
     func menuIcon() -> NSImage {
@@ -512,9 +551,11 @@ struct CharacterPreview: NSViewRepresentable {
 
 struct ControlRoom: View {
     @ObservedObject var owner: PetController
-    let accent=Color(red:0.77,green:0.71,blue:0.99)
+    var accent:Color { owner.selectedCharacter == CharacterCatalog.peon
+        ? Color(red:0.94,green:0.71,blue:0.37) : Color(red:0.77,green:0.71,blue:0.99) }
     let cream=Color(red:0.94,green:0.94,blue:0.90)
     var body: some View {
+        ScrollView(.vertical) {
         VStack(alignment:.leading,spacing:0) {
             HStack {
                 Text("PEONS")
@@ -524,10 +565,13 @@ struct ControlRoom: View {
                 Text(owner.isHidden ? "HIDDEN" : owner.displayedMode.rawValue.uppercased())
                     .font(.system(size:9,weight:.medium,design:.monospaced)).foregroundColor(.white.opacity(0.5))
             }.padding(.top,35)
-            Text("Tiny Rick.\nBig attitude.")
+            Text(owner.selectedCharacter.headline)
                 .font(.system(size:32,weight:.heavy,design:.rounded)).tracking(-0.9).lineSpacing(-2).foregroundColor(cream).padding(.top,24)
             Text("Your desktop. His playground.")
                 .font(.system(size:13)).foregroundColor(.white.opacity(0.5)).padding(.top,8)
+            Picker("Character",selection:Binding(get:{owner.selectedCharacter.id},set:{owner.selectCharacter(CharacterCatalog.resolve($0))})) {
+                ForEach(CharacterCatalog.all) { character in Text(character.name).tag(character.id) }
+            }.pickerStyle(.segmented).labelsHidden().accessibilityLabel("Character").padding(.top,18)
             HStack(spacing:20) {
                 CharacterPreview(character:owner.selectedCharacter).frame(width:180,height:239)
                 VStack(alignment:.leading,spacing:10) {
@@ -548,7 +592,7 @@ struct ControlRoom: View {
                     Label("Take control",systemImage:"gamecontroller.fill").font(.system(size:13,weight:.bold)).frame(maxWidth:.infinity).padding(.vertical,13)
                 }.buttonStyle(.plain).foregroundColor(Color(red:0.13,green:0.12,blue:0.18)).background(accent).clipShape(RoundedRectangle(cornerRadius:11))
                 Button { owner.roam();owner.controlWindow?.close() } label: {
-                    Text("Let Rick roam").font(.system(size:13,weight:.semibold)).frame(maxWidth:.infinity).padding(.vertical,13)
+                    Text("Let him roam").font(.system(size:13,weight:.semibold)).frame(maxWidth:.infinity).padding(.vertical,13)
                 }.buttonStyle(.plain).foregroundColor(cream).background(.white.opacity(0.06)).clipShape(RoundedRectangle(cornerRadius:11))
             }.padding(.top,20)
             HStack(spacing:12) {
@@ -575,14 +619,14 @@ struct ControlRoom: View {
                 }.frame(maxWidth:.infinity,alignment:.leading)
             }.padding(17).background(.white.opacity(0.025)).clipShape(RoundedRectangle(cornerRadius:12)).padding(.top,17)
             HStack(spacing:9) {
-                Text("Right-click Rick for speed, nap, and other controls.").font(.system(size:10)).foregroundColor(.white.opacity(0.35))
+                Text("Right-click your peon for speed, nap, and other controls.").font(.system(size:10)).foregroundColor(.white.opacity(0.35))
                 Spacer()
                 Button(owner.isHidden ? "Show" : "Hide") { owner.toggleHidden() }.buttonStyle(.plain)
                 Text("·").foregroundColor(.white.opacity(0.2))
                 Button("Quit") { owner.quit() }.buttonStyle(.plain)
             }.font(.system(size:10)).foregroundColor(.white.opacity(0.5)).padding(.top,18)
-            Spacer(minLength:20)
-        }.padding(.horizontal,30).frame(width:620,height:748).background(Color(red:0.075,green:0.08,blue:0.10)).preferredColorScheme(.dark)
+        }.padding(.horizontal,30).padding(.bottom,20).frame(width:620)
+        }.background(Color(red:0.075,green:0.08,blue:0.10)).preferredColorScheme(.dark)
     }
     func key(_ title:String,_ description:String)->some View {
         HStack(spacing:7) {

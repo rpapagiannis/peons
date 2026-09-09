@@ -8,9 +8,9 @@ enum AppConfigurationTests {
             precondition(condition, message)
             checks += 1
         }
-        func expectTinyRick(_ controller: PetController) {
-            expect(controller.selectedCharacter.id == "rat-suit-rick", "Controls must describe Rat Suit Rick")
-            expect(controller.model.character.id == "rat-suit-rick", "The desktop pet must be Rat Suit Rick")
+        func expectTiny(_ controller: PetController, character:CharacterDefinition = CharacterCatalog.ratSuit) {
+            expect(controller.selectedCharacter == character, "Controls must describe the selected character")
+            expect(controller.model.character == character, "The desktop pet must match the selected character")
             expect(abs(controller.model.size.width - 135.68) < 0.000001 && abs(controller.model.size.height - 180.2) < 0.000001,
                    "The desktop pet must always use Tiny, including after reloading legacy preferences")
         }
@@ -22,16 +22,16 @@ enum AppConfigurationTests {
         }
 
         let fresh = PetController()
-        expectTinyRick(fresh)
+        expectTiny(fresh)
         fresh.loadPreferences(from: defaults)
-        expectTinyRick(fresh)
+        expectTiny(fresh)
         expect(fresh.soundEnabled && fresh.chatterEnabled && fresh.volume == 0.5 && fresh.model.speed == 150,
                "A fresh install must retain the voice and movement defaults")
         expect(defaults.object(forKey: "size") == nil, "A fresh install must not persist an obsolete size selection")
 
         // Exercise persisted selections from every formerly available character and all old sizes.
         let retiredIDs = [
-            "pickle-rick", "peon", "peasant", "wc2_peasant", "murloc", "glados",
+            "pickle-rick", "peasant", "wc2_peasant", "murloc", "glados",
             "sc_marine", "sc_firebat", "sc_medic", "sc_kerrigan", "sc_scv", "sc_tank",
             "sc_battlecruiser", "sc_vessel", "sc_terran", "ra2_kirov", "ra2_soviet_engineer",
             "ra_soviet", "tf2_engineer", "hd2_helldiver", "dota2_axe", "duke_nukem",
@@ -39,7 +39,8 @@ enum AppConfigurationTests {
             "pulp_fiction", "sopranos", "unknown-character"
         ]
         let oldSizes:[Any] = [0, 1, 2, 3, -1, 10000, "invalid"]
-        for characterID in ["rat-suit-rick"] + retiredIDs {
+        for characterID in CharacterCatalog.all.map(\.id) + retiredIDs {
+            let expected=CharacterCatalog.resolve(characterID)
             for oldSize in oldSizes {
                 defaults.removePersistentDomain(forName: suiteName)
                 defaults.set(characterID, forKey: "character")
@@ -52,16 +53,16 @@ enum AppConfigurationTests {
                 let controller = PetController()
                 controller.model.size = CGSize(width: 512, height: 680)
                 controller.loadPreferences(from: defaults)
-                expectTinyRick(controller)
+                expectTiny(controller,character:expected)
                 expect(!controller.soundEnabled && !controller.chatterEnabled && controller.volume == 0.27,
                        "Migrating appearance must preserve voice, chatter, and volume preferences")
                 expect(controller.model.speed == 240, "Migrating appearance must preserve movement speed")
-                expect(defaults.string(forKey: "character") == "rat-suit-rick" && defaults.object(forKey: "size") == nil,
+                expect(defaults.string(forKey: "character") == expected.id && defaults.object(forKey: "size") == nil,
                        "Migration must replace retired character IDs and remove the size preference")
 
                 let relaunched = PetController()
                 relaunched.loadPreferences(from: defaults)
-                expectTinyRick(relaunched)
+                expectTiny(relaunched,character:expected)
                 expect(!relaunched.soundEnabled && !relaunched.chatterEnabled && relaunched.volume == 0.27 && relaunched.model.speed == 240,
                        "A subsequent launch must preserve voice and speed settings after migration")
             }
@@ -79,16 +80,33 @@ enum AppConfigurationTests {
             menu.items.flatMap { item in [item] + (item.submenu.map(allItems) ?? []) }
         }
         for item in allItems(menu) {
-            expect(!["size", "character", "characters"].contains(item.title.lowercased()),
-                   "The context and menu-bar menus must not offer appearance selectors")
+            expect(item.title.lowercased() != "size",
+                   "The context and menu-bar menus must not offer retired size choices")
             if let action = item.action {
-                expect(!["chooseSize:", "chooseCharacter:"].contains(NSStringFromSelector(action)),
-                       "No menu may invoke a removed appearance selector")
+                expect(NSStringFromSelector(action) != "chooseSize:",
+                       "No menu may invoke the removed size selector")
             }
         }
         let titles = Set(menu.items.map(\.title))
         expect(titles.contains("Rick controls…") && titles.contains("Sound · M to mute") && titles.contains("Occasional chatter") && titles.contains("Speed"),
                "Rick controls, voice settings, and speed must remain accessible")
+        let choices=menu.items.first{$0.title == "Character"}!.submenu!.items
+        expect(choices.map{$0.representedObject as? String} == CharacterCatalog.all.map{Optional($0.id)},
+               "Both characters must be available in the menu")
+        menuController.soundEnabled=false
+        menuController.chooseCharacter(choices[1])
+        expectTiny(menuController,character:CharacterCatalog.peon)
+        expect(defaults.string(forKey:"character") == "peon","Choosing a character must save it")
+        let peonMenu=menuController.makeMenu()
+        let peonTitles=Set(peonMenu.items.map(\.title))
+        expect(peonTitles.contains("Peon controls…") && peonTitles.contains("Bring Peon here") && peonTitles.contains("Hide Peon"),
+               "Menus must describe Peon after switching")
+        let peonChoices=peonMenu.items.first{$0.title == "Character"}!.submenu!.items
+        expect(peonChoices[0].state == .off && peonChoices[1].state == .on,"Only the selected character must be checked")
+        let restored=PetController();restored.loadPreferences(from:defaults)
+        expectTiny(restored,character:CharacterCatalog.peon)
+        menuController.chooseCharacter(peonChoices[0])
+        expectTiny(menuController)
 
         func inputController() -> (PetController, PetView) {
             let controller = PetController()
@@ -156,6 +174,36 @@ enum AppConfigurationTests {
         shortcutView.keyDown(with: keyEvent())
         shortcutView.keyUp(with: keyEvent(.keyUp, flags: .command))
         expect(!shortcut.model.keys.contains(2), "Movement key-up must still release the key while Command is held")
-        print("Passed \(checks) app configuration checks: Tiny Rick defaults, retired preference migration, relaunch, preserved voice/speed settings, menus without appearance selectors, and modifier-aware keyboard input.")
+
+        // Exercise the real hosted view: its intrinsic size previously enlarged an
+        // 800-point window to 832 points even when only 780 points were available.
+        _ = NSApplication.shared
+        func scrollView(in view:NSView) -> NSScrollView? {
+            if let scroll=view as? NSScrollView { return scroll }
+            return view.subviews.compactMap { scrollView(in:$0) }.first
+        }
+        let screen=NSScreen.screens[0].visibleFrame
+        for height:CGFloat in [780,600,480] {
+            let available=CGRect(x:screen.minX,y:screen.minY,width:screen.width,height:min(height,screen.height))
+            let window=fresh.makeControlsWindow(in:available)
+            let content=window.contentView!
+            content.layoutSubtreeIfNeeded()
+            RunLoop.current.run(until:Date(timeIntervalSinceNow:0.05))
+            content.layoutSubtreeIfNeeded()
+            expect(available.contains(window.frame),"Hosting the controls must not enlarge the window beyond the available screen")
+            expect(window.styleMask.contains(.resizable),"The controls must allow a shorter window")
+            let scroll=scrollView(in:content)
+            expect(scroll != nil,"Controls that do not fit must remain reachable by scrolling")
+            if let scroll,let document=scroll.documentView {
+                let bottom=document.isFlipped ? document.bounds.maxY : document.bounds.minY
+                scroll.contentView.scroll(to:CGPoint(x:0,y:bottom))
+                scroll.reflectScrolledClipView(scroll.contentView)
+                let visible=document.visibleRect
+                expect(document.isFlipped ? visible.maxY>=document.bounds.maxY-1 : visible.minY<=document.bounds.minY+1,
+                       "Scrolling must reveal the end of the controls, including Hide and Quit")
+                expect(available.contains(window.frame),"Scrolling must not resize the window beyond the screen")
+            }
+        }
+        print("Passed \(checks) app configuration checks: Tiny defaults, character selection and relaunch, retired preference migration, preserved voice/speed settings, menus, modifier-aware keyboard input, and controls on short displays.")
     }
 }

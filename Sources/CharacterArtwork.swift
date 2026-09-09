@@ -4,7 +4,7 @@ import ImageIO
 final class CharacterArtwork {
     let atlas: CGImage?
     let frames: [[CGImage]]
-    var isLoaded: Bool { frames.count == 3 && frames.allSatisfy { $0.count == 4 } }
+    let isLoaded: Bool
 
     init(_ character: CharacterDefinition) {
         let sheet = character.sprites
@@ -15,9 +15,17 @@ final class CharacterArtwork {
             return CGImageSourceCreateImageAtIndex(source, 0, nil)
         }.first
         if let atlas {
-            frames = sheet.rows.map { y in sheet.columns.compactMap { x in
-                atlas.cropping(to: CGRect(x: CGFloat(x), y: CGFloat(y), width: sheet.cellSize.width, height: sheet.cellSize.height))
+            let bounds=CGRect(x:0,y:0,width:atlas.width,height:atlas.height)
+            frames = sheet.frameRects.map { row in row.compactMap { rect in
+                bounds.contains(rect) && rect.width>0 && rect.height>0 ? atlas.cropping(to:rect) : nil
             } }
         } else { frames = [] }
+        let loadedFrames=frames
+        isLoaded = loadedFrames.count == 3 && sheet.footCorrections.count == 3 && !sheet.walkFrames.isEmpty
+            && loadedFrames.indices.allSatisfy { row in
+                loadedFrames[row].count == sheet.frameRects[row].count && loadedFrames[row].count >= 4
+                    && sheet.footCorrections[row].count == loadedFrames[row].count
+                    && sheet.walkFrames.allSatisfy { loadedFrames[row].indices.contains($0) }
+            }
     }
 }

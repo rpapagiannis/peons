@@ -10,6 +10,22 @@ The app selects the existing poses at runtime. It does not alter the source atla
 
 The Peons app icon uses the large front-facing Rick portrait from the same Rat Suit Pickle Rick atlas, drawn over an original dark background. The icon shares the character artwork attribution above; the source atlas remains unmodified.
 
+## Warcraft Peon artwork
+
+`warcraft-peon-sheet.png` is the unmodified **Peon** sheet from **Warcraft II** (MS-DOS), uploaded by **Maxim** to [The Spriters Resource](https://www.spriters-resource.com/ms_dos/warcraftii/asset/29480/), retrieved 2026-09-09. [Direct PNG](https://www.spriters-resource.com/media/assets/27/29480.png?updated=1755472636). Warcraft and its artwork belong to Blizzard Entertainment.
+
+The original 255 × 1017 RGBA sheet has SHA-256 `fee05cc9b6b92c666990102ae74a1bc2f6baca8b254bde57088d167f13f960a7`. Its magenta/white gutters already have zero alpha. The source directions run north, northeast, east, southeast, south. The app crops front, side, and back sequences from x = 203, 108, 5, with five poses at y = 0, 38, 79, 120, 161. Each crop is 46 × 38; pose 0 is idle and poses 1–4 form the walk cycle. The right-facing side view is mirrored for leftward movement. No credits, working/carrying poses, or adjacent sprites enter these crops.
+
+Rendering preserves the original aspect ratio at 5× source pixels within the shared canvas, with nearest-neighbor sampling. Per-pose foot offsets in `Sources/Characters.swift` compensate for transparent padding so the feet meet the same physical floor as Rick. Artwork tests verify all 15 crops and both directions of the rendered walk cycle. Source pixels remain unchanged.
+
+## Recorded Warcraft Peon voices
+
+The complete 17-clip English **Orc Peon** pack (Warcraft III), version **1.1.0**, comes from [PeonPing/og-packs](https://github.com/PeonPing/og-packs/tree/5d1245fe0188c8da775ca8875c32ee7bf8d92c57/peon), pinned to commit `5d1245fe0188c8da775ca8875c32ee7bf8d92c57` on 2026-09-09. The upstream pack credits **tonyyont** and declares **CC-BY-NC-4.0**; the underlying recordings belong to Blizzard Entertainment. This records the fan pack's declaration without claiming a license from Blizzard.
+
+`sounds/peon/openpeon.json` retains the upstream manifest verbatim. The original WAVs match every upstream SHA-256; `research/peon-audio-provenance.json` records their pinned URLs and checksums. `sounds/peon/lines.json` is the app's complete ordered playback inventory, beginning with Ready to work, Work work, Something need doing, and Okie dokie. Each character retains its own cycle when switching.
+
+As with Rick, `scripts/prepare_audio.swift` prepares derived PCM WAVs toward −20 dBFS RMS with at least 3 dB sample-peak headroom, preserving duration, channels, rate, and frames. `sounds/peon/normalization.json` records the measurements, gains, and checksums. Only the normalized files are bundled for playback; original recordings stay in the source tree.
+
 
 ## Recorded Rick voice selection
 

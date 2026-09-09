@@ -84,6 +84,29 @@ private final class RecordingSoundPlayer: SoundPlaying {
         expect(player.playingLineID == CharacterCatalog.ratSuit.lines[1].id && player.playingEffectID == nil,
                "A direct voice request must replace the effect and continue the original cycle")
 
+        let (switching,switchPlayer)=controller()
+        switching.say(.greet)
+        switching.selectCharacter(CharacterCatalog.peon)
+        expect(switchPlayer.playingLineID == CharacterCatalog.peon.lines[0].id && switching.speech == CharacterCatalog.peon.lines[0].text,
+               "Character selection must stop Rick and play Peon's matching caption and voice")
+        switching.selectCharacter(CharacterCatalog.ratSuit)
+        expect(switchPlayer.playingLineID == CharacterCatalog.ratSuit.lines[1].id,
+               "Returning to Rick must continue his previous cycle")
+        switching.openPortal(to:destination)
+        let portalTime=switching.model.portalTime
+        switching.selectCharacter(CharacterCatalog.peon)
+        expect(switching.model.portalTime == portalTime && switching.model.portalDestination == destination && switchPlayer.playingEffectID == nil,
+               "Switching during a portal preserves travel and replaces its sound once")
+        expect(switchPlayer.playingLineID == CharacterCatalog.peon.lines[1].id,
+               "Returning to Peon must continue his own voice cycle")
+        switching.model.setMode(.paused)
+        switching.selectCharacter(CharacterCatalog.ratSuit)
+        expect(!switchPlayer.isPlaying && switching.speech == nil && switching.model.mode == .paused,
+               "Switching a sleeping pet must silence playback and retain its nap")
+        switching.model.setMode(.roaming);switching.isHidden=true
+        switching.selectCharacter(CharacterCatalog.peon)
+        expect(!switchPlayer.isPlaying && switching.isHidden,"Switching a hidden pet must stay hidden and silent")
+
         let (keyboard,keyPlayer)=controller()
         let view=PetView(frame:CGRect(origin:.zero,size:keyboard.model.size));view.owner=keyboard
         func portalKey(repeated: Bool = false) -> NSEvent {

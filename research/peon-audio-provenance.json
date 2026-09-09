@@ -1,0 +1,87 @@
+[
+  {
+    "file": "assets/sounds/peon/PeonReady1.wav",
+    "source": "https://raw.githubusercontent.com/PeonPing/og-packs/5d1245fe0188c8da775ca8875c32ee7bf8d92c57/peon/sounds/PeonReady1.wav",
+    "sha256": "c821c124004af55b1d1bc97261e4f4521e234b78748addd585b3f03711f64584"
+  },
+  {
+    "file": "assets/sounds/peon/PeonWhat4.wav",
+    "source": "https://raw.githubusercontent.com/PeonPing/og-packs/5d1245fe0188c8da775ca8875c32ee7bf8d92c57/peon/sounds/PeonWhat4.wav",
+    "sha256": "6ee4f9d9f9d2fede1f953a196de8875dba2ffefa0c5c732adad3de45bbaf090e"
+  },
+  {
+    "file": "assets/sounds/peon/PeonYes1.wav",
+    "source": "https://raw.githubusercontent.com/PeonPing/og-packs/5d1245fe0188c8da775ca8875c32ee7bf8d92c57/peon/sounds/PeonYes1.wav",
+    "sha256": "a644ec5632e566df6c057e124319884b5123eea5d5f54b04280b097c2231cc0b"
+  },
+  {
+    "file": "assets/sounds/peon/PeonYes2.wav",
+    "source": "https://raw.githubusercontent.com/PeonPing/og-packs/5d1245fe0188c8da775ca8875c32ee7bf8d92c57/peon/sounds/PeonYes2.wav",
+    "sha256": "1aaee40174ef4f6109dadc1d28edcbcd63eae27bd9e0b520c40c17e988a365d6"
+  },
+  {
+    "file": "assets/sounds/peon/PeonYes4.wav",
+    "source": "https://raw.githubusercontent.com/PeonPing/og-packs/5d1245fe0188c8da775ca8875c32ee7bf8d92c57/peon/sounds/PeonYes4.wav",
+    "sha256": "89b9f19fec29fde3b513cc98bcf1614a6d264850f65e6816a4483ac49dc34cc2"
+  },
+  {
+    "file": "assets/sounds/peon/PeonYesAttack3.wav",
+    "source": "https://raw.githubusercontent.com/PeonPing/og-packs/5d1245fe0188c8da775ca8875c32ee7bf8d92c57/peon/sounds/PeonYesAttack3.wav",
+    "sha256": "097361087515743db44ee93bfc4865fc331d270cb512805844610259a012b869"
+  },
+  {
+    "file": "assets/sounds/peon/PeonWorkComplete.wav",
+    "source": "https://raw.githubusercontent.com/PeonPing/og-packs/5d1245fe0188c8da775ca8875c32ee7bf8d92c57/peon/sounds/PeonWorkComplete.wav",
+    "sha256": "e6d666c474ea82b2e4b6f22756a9e95218fa2f6053a138f68e6237e196803ae6"
+  },
+  {
+    "file": "assets/sounds/peon/PeonYes3.wav",
+    "source": "https://raw.githubusercontent.com/PeonPing/og-packs/5d1245fe0188c8da775ca8875c32ee7bf8d92c57/peon/sounds/PeonYes3.wav",
+    "sha256": "18669847b60fc5b1bb41327dc075412aeb2a823d5a9d84476ddc2960baffa959"
+  },
+  {
+    "file": "assets/sounds/peon/PeonAngry4.wav",
+    "source": "https://raw.githubusercontent.com/PeonPing/og-packs/5d1245fe0188c8da775ca8875c32ee7bf8d92c57/peon/sounds/PeonAngry4.wav",
+    "sha256": "39493727ee0dc6f134ee1c666c63240c6c9df77bceb8b529b549aa980d3849df"
+  },
+  {
+    "file": "assets/sounds/peon/PeonDeath.wav",
+    "source": "https://raw.githubusercontent.com/PeonPing/og-packs/5d1245fe0188c8da775ca8875c32ee7bf8d92c57/peon/sounds/PeonDeath.wav",
+    "sha256": "c46dd952a4dca36cc3e71b5594d6b102ad8366380ca411190e38290090d258c8"
+  },
+  {
+    "file": "assets/sounds/peon/PeonWhat2.wav",
+    "source": "https://raw.githubusercontent.com/PeonPing/og-packs/5d1245fe0188c8da775ca8875c32ee7bf8d92c57/peon/sounds/PeonWhat2.wav",
+    "sha256": "51d3de60bbb1973f291b7059dc1a8c0d44ff7f524d31881c4ab790c5a2922ef2"
+  },
+  {
+    "file": "assets/sounds/peon/PeonWhat3.wav",
+    "source": "https://raw.githubusercontent.com/PeonPing/og-packs/5d1245fe0188c8da775ca8875c32ee7bf8d92c57/peon/sounds/PeonWhat3.wav",
+    "sha256": "4e8197030f01cbaef968ddb9566f19bfd68b3af622748238a3049d218bb64eed"
+  },
+  {
+    "file": "assets/sounds/peon/PeonWhat1.wav",
+    "source": "https://raw.githubusercontent.com/PeonPing/og-packs/5d1245fe0188c8da775ca8875c32ee7bf8d92c57/peon/sounds/PeonWhat1.wav",
+    "sha256": "d4f5696d9db6875c80c8dccf95f6d8047a4564b214be90792b8a766e313106a3"
+  },
+  {
+    "file": "assets/sounds/peon/PeonWarcry1.wav",
+    "source": "https://raw.githubusercontent.com/PeonPing/og-packs/5d1245fe0188c8da775ca8875c32ee7bf8d92c57/peon/sounds/PeonWarcry1.wav",
+    "sha256": "a8405dccabe1de88a421e77526cc9f89acb6e1c0eb43011e31a63305d2a9c310"
+  },
+  {
+    "file": "assets/sounds/peon/PeonAngry1.wav",
+    "source": "https://raw.githubusercontent.com/PeonPing/og-packs/5d1245fe0188c8da775ca8875c32ee7bf8d92c57/peon/sounds/PeonAngry1.wav",
+    "sha256": "12383949b2a8241fd6f5a6edc03c0655f9765d0744a7aecc709d6026bb8f4698"
+  },
+  {
+    "file": "assets/sounds/peon/PeonAngry2.wav",
+    "source": "https://raw.githubusercontent.com/PeonPing/og-packs/5d1245fe0188c8da775ca8875c32ee7bf8d92c57/peon/sounds/PeonAngry2.wav",
+    "sha256": "bbf910617a548e55a45d2a7ebc74e45fa18e8bc6a3004f84e6e1af94434b146d"
+  },
+  {
+    "file": "assets/sounds/peon/PeonAngry3.wav",
+    "source": "https://raw.githubusercontent.com/PeonPing/og-packs/5d1245fe0188c8da775ca8875c32ee7bf8d92c57/peon/sounds/PeonAngry3.wav",
+    "sha256": "cf68875ec1600020d304c4b3c23a0116509acbf8e61d67d30c6d6ffcb9f13b69"
+  }
+]

@@ -1,13 +1,56 @@
 import AppKit
 import ImageIO
 
-// Directional Pocket Mortys poses, kept in their original, unmodified atlas.
+// Directional character poses, kept in their original, unmodified atlases.
 // Attribution and frame coordinates are documented in assets/ATTRIBUTION.md.
 enum PetRenderer {
     static let ink = NSColor(hex:0x14251b)
     private static let artwork = Dictionary(uniqueKeysWithValues: CharacterCatalog.all.map { ($0.id,CharacterArtwork($0)) })
     static func art(for character: CharacterDefinition) -> CharacterArtwork { artwork[character.id] ?? CharacterArtwork(character) }
     static func hasArtwork(for character: CharacterDefinition) -> Bool { art(for:character).isLoaded }
+
+    private struct HitPose: Equatable {
+        let characterID: String
+        let phase: CGFloat
+        let walking: Bool
+        let age: Double
+        let jump: CGFloat
+        let mode: PetMode
+        let portal: CGFloat?
+        let reducedMotion: Bool
+        let facing: PetFacing
+        let anticipation: CGFloat
+        let landing: CGFloat
+        let turn: CGFloat
+        let idleTime: Double
+        let dragging: Bool
+        let frontLocked: Bool
+        init(_ model:PetModel,reducedMotion:Bool) {
+            characterID=model.character.id;phase=model.phase;walking=model.isWalking
+            age=model.age;jump=model.jumpHeight;mode=model.mode
+            portal=model.portalTime>0 ? model.portalProgress : nil
+            self.reducedMotion=reducedMotion;facing=model.facing
+            anticipation=CGFloat(model.jumpPreparation);landing=CGFloat(model.landingTime)
+            turn=CGFloat(model.turnTime);idleTime=model.idleTime
+            dragging=model.isDragging;frontLocked=model.frontLocked
+        }
+    }
+    private struct HitSurface {
+        let bitmap:NSBitmapImageRep
+        let graphics:NSGraphicsContext
+        init?(width:Int,height:Int) {
+            guard let bitmap=NSBitmapImageRep(bitmapDataPlanes:nil,pixelsWide:width,pixelsHigh:height,
+                    bitsPerSample:8,samplesPerPixel:4,hasAlpha:true,isPlanar:false,colorSpaceName:.deviceRGB,
+                    bytesPerRow:0,bitsPerPixel:0),let graphics=NSGraphicsContext(bitmapImageRep:bitmap) else { return nil }
+            self.bitmap=bitmap
+            let context=graphics.cgContext
+            context.translateBy(x:0,y:CGFloat(height));context.scaleBy(x:1,y:-1)
+            self.graphics=NSGraphicsContext(cgContext:context,flipped:true)
+        }
+    }
+    private static let pointSurface=HitSurface(width:1,height:1)
+    private static let canvasSurface=HitSurface(width:256,height:340)
+    private static var canvasHitPose:HitPose?
 
     static func ellipse(_ rect:NSRect,_ fill:NSColor,stroke:NSColor? = ink,width:CGFloat = 2.8) {
         let p=NSBezierPath(ovalIn:rect);fill.setFill();p.fill()
@@ -38,13 +81,15 @@ enum PetRenderer {
             direction=idleCycle>6.8 && idleCycle<7.65 ? .left : .front
         }
         let row=direction == .back ? 2 : (direction == .front ? 0 : 1)
-        var frame=walking ? Int(floor(phase/(2 * .pi)*4)) % 4 : 0
+        let sheet=character.sprites
+        let step=Int(floor(max(0,phase)/(2 * .pi)*CGFloat(sheet.walkFrames.count))) % sheet.walkFrames.count
+        var frame=walking ? sheet.walkFrames[step] : 0
         if jump>4 || dragging { frame=direction == .front ? 3 : 1 }
         let sprite=artwork.frames[row][max(0,frame)]
         ctx.saveGState()
         ctx.translateBy(x:rect.minX,y:rect.minY)
         ctx.scaleBy(x:rect.width/256,y:rect.height/340)
-        ctx.interpolationQuality = .high
+        ctx.interpolationQuality = sheet.pixelArt ? .none : .high
         let lift:CGFloat=worldPositioned ? 0 : min(60,jump)
         let breath=reducedMotion ? 0 : sin(age*2.35)*0.005
         let impact=sin(min(1,landing/0.22) * .pi)
@@ -84,9 +129,9 @@ enum PetRenderer {
         ctx.rotate(by:lean)
         let turnScale:CGFloat=1-(turn>0 ? sin((1-turn/0.13) * .pi)*0.10 : 0)
         ctx.scaleBy(x:stretchX*turnScale,y:stretchY)
-        if direction == .right { ctx.scaleBy(x:-1,y:1) }
+        if direction == (sheet.mirrorsRight ? .right : .left) { ctx.scaleBy(x:-1,y:1) }
         // Every crop has the same cell size and foot baseline; changing poses never jitters the rig.
-        let destination=CGRect(x:-100,y:-256,width:200,height:256)
+        let destination=CGRect(x:-sheet.drawSize.width/2,y:-sheet.drawSize.height,width:sheet.drawSize.width,height:sheet.drawSize.height)
         ctx.translateBy(x:destination.minX,y:destination.maxY)
         ctx.scaleBy(x:1,y:-1)
         ctx.draw(sprite,in:CGRect(x:0,y:0,width:destination.width,height:destination.height))
@@ -99,25 +144,30 @@ enum PetRenderer {
 
     static func contains(_ point:CGPoint,model:PetModel,reducedMotion:Bool=false) -> Bool {
         guard CGRect(x:0,y:0,width:256,height:340).contains(point),art(for:model.character).isLoaded else { return false }
-        // Sample the actual animated body under the pointer. Decorations never capture clicks.
-        var pixel=[UInt8](repeating:0,count:4)
-        pixel.withUnsafeMutableBytes { bytes in
-            guard let context=CGContext(data:bytes.baseAddress,width:1,height:1,bitsPerComponent:8,
-                                        bytesPerRow:4,space:CGColorSpaceCreateDeviceRGB(),
-                                        bitmapInfo:CGImageAlphaInfo.premultipliedLast.rawValue) else { return }
+        let pixelArt=model.character.sprites.pixelArt
+        guard let surface=pixelArt ? canvasSurface : pointSurface else { return false }
+        let pose=HitPose(model,reducedMotion:reducedMotion)
+        if !pixelArt || canvasHitPose != pose {
+            // Smooth sprites need only one pixel. Nearest-neighbor edges round
+            // differently in a shifted or clipped context, so pixel art keeps the
+            // full canvas origin. Reuse both surfaces instead of allocating per tick.
+            let context=surface.graphics.cgContext
+            context.saveGState()
             NSGraphicsContext.saveGraphicsState()
-            defer { NSGraphicsContext.restoreGraphicsState() }
-            NSGraphicsContext.current=NSGraphicsContext(cgContext:context,flipped:true)
-            context.translateBy(x:0.5-point.x,y:0.5+point.y)
-            context.scaleBy(x:1,y:-1)
-            draw(in:CGRect(x:0,y:0,width:256,height:340),character:model.character,phase:model.phase,
-                 walking:model.isWalking,age:model.age,jump:model.jumpHeight,mode:model.mode,
-                 portal:model.portalTime>0 ? model.portalProgress : nil,reducedMotion:reducedMotion,
-                 facing:model.facing,anticipation:CGFloat(model.jumpPreparation),
-                 landing:CGFloat(model.landingTime),turn:CGFloat(model.turnTime),idleTime:model.idleTime,
-                 dragging:model.isDragging,worldPositioned:true,frontLocked:model.frontLocked,includeEffects:false)
+            defer { NSGraphicsContext.restoreGraphicsState();context.restoreGState() }
+            context.clear(CGRect(x:0,y:0,width:surface.bitmap.pixelsWide,height:surface.bitmap.pixelsHigh))
+            if !pixelArt { context.translateBy(x:-floor(point.x),y:-floor(point.y)) }
+            NSGraphicsContext.current=surface.graphics
+            draw(in:CGRect(x:0,y:0,width:256,height:340),character:model.character,phase:pose.phase,
+                 walking:pose.walking,age:pose.age,jump:pose.jump,mode:pose.mode,portal:pose.portal,
+                 reducedMotion:pose.reducedMotion,facing:pose.facing,anticipation:pose.anticipation,
+                 landing:pose.landing,turn:pose.turn,idleTime:pose.idleTime,dragging:pose.dragging,
+                 worldPositioned:true,frontLocked:pose.frontLocked,includeEffects:false)
+            if pixelArt { canvasHitPose=pose }
         }
-        return pixel[3]>16
+        guard let pixels=surface.bitmap.bitmapData else { return false }
+        let offset=pixelArt ? Int(point.y)*surface.bitmap.bytesPerRow+Int(point.x)*4 : 0
+        return pixels[offset+3]>16
     }
 
     static func drawPortal(_ ctx:CGContext,progress:CGFloat,age:Double) {

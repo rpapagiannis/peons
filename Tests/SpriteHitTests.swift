@@ -6,16 +6,18 @@ enum SpriteHitTests {
         let started=ProcessInfo.processInfo.systemUptime
         var checks=0
         var poses:[(String,PetModel)]=[]
+        for character in CharacterCatalog.all {
         for facing in [PetFacing.front,.left,.right,.back] {
             var idle=PetModel()
+            idle.selectCharacter(character)
             idle.setMode(.controlled)
             idle.facing=facing
             idle.age=1.2
-            poses.append(("\(facing.rawValue) idle",idle))
-            for frame in 0..<4 {
+            poses.append(("\(character.name) \(facing.rawValue) idle",idle))
+            for frame in 0..<character.sprites.walkFrames.count {
                 var walking=idle
                 walking.velocity.dx=150
-                walking.phase=CGFloat(frame) * .pi / 2
+                walking.phase=CGFloat(frame) * 2 * .pi / CGFloat(character.sprites.walkFrames.count)
                 poses.append(("\(facing.rawValue) walk \(frame)",walking))
             }
             var jumping=idle
@@ -38,12 +40,15 @@ enum SpriteHitTests {
             poses.append(("\(facing.rawValue) portal",portal))
         }
         var glance=PetModel()
+        glance.selectCharacter(character)
         glance.idleTime=2
         glance.age=7
         poses.append(("roaming glance",glance))
         var invisible=PetModel()
+        invisible.selectCharacter(character)
         invisible.portalTime=0.425
         poses.append(("portal midpoint",invisible))
+        }
 
         for reducedMotion in [false,true] {
             for (label,model) in poses {
@@ -52,8 +57,12 @@ enum SpriteHitTests {
                 for y in stride(from:0,to:340,by:8) {
                     for x in stride(from:0,to:256,by:8) {
                         let alpha=bitmap.colorAt(x:x,y:y)!.alphaComponent
-                        let point=CGPoint(x:CGFloat(x)+0.5,y:CGFloat(y)+0.5)
+                        // Fractional pointer coordinates sample the same pixel as
+                        // the rendered bitmap, including sharp edges during turns.
+                        let point=CGPoint(x:CGFloat(x)+0.25,y:CGFloat(y)+0.75)
                         let hit=PetRenderer.contains(point,model:model,reducedMotion:reducedMotion)
+                        precondition(hit == (alpha>16.0/255),"\(model.character.name) \(label) disagrees with rendered alpha at \(point)")
+                        checks += 1
                         if alpha==0 {
                             precondition(!hit,"\(label) intercepts transparent pixel \(point)")
                             checks += 1

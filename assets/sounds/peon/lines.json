@@ -1,0 +1,87 @@
+[
+  {
+    "id": "PeonReady1.wav",
+    "text": "Ready to work!",
+    "audioAsset": "peon/normalized/PeonReady1.wav"
+  },
+  {
+    "id": "PeonYes3.wav",
+    "text": "Work, work.",
+    "audioAsset": "peon/normalized/PeonYes3.wav"
+  },
+  {
+    "id": "PeonWhat4.wav",
+    "text": "Something need doing?",
+    "audioAsset": "peon/normalized/PeonWhat4.wav"
+  },
+  {
+    "id": "PeonYes4.wav",
+    "text": "Okie dokie.",
+    "audioAsset": "peon/normalized/PeonYes4.wav"
+  },
+  {
+    "id": "PeonYes1.wav",
+    "text": "I can do that.",
+    "audioAsset": "peon/normalized/PeonYes1.wav"
+  },
+  {
+    "id": "PeonYes2.wav",
+    "text": "Be happy to.",
+    "audioAsset": "peon/normalized/PeonYes2.wav"
+  },
+  {
+    "id": "PeonYesAttack3.wav",
+    "text": "I'll try!",
+    "audioAsset": "peon/normalized/PeonYesAttack3.wav"
+  },
+  {
+    "id": "PeonWorkComplete.wav",
+    "text": "Work complete.",
+    "audioAsset": "peon/normalized/PeonWorkComplete.wav"
+  },
+  {
+    "id": "PeonAngry4.wav",
+    "text": "Me not that kind of orc!",
+    "audioAsset": "peon/normalized/PeonAngry4.wav"
+  },
+  {
+    "id": "PeonDeath.wav",
+    "text": "Ugh.",
+    "audioAsset": "peon/normalized/PeonDeath.wav"
+  },
+  {
+    "id": "PeonWhat2.wav",
+    "text": "Hmm?",
+    "audioAsset": "peon/normalized/PeonWhat2.wav"
+  },
+  {
+    "id": "PeonWhat3.wav",
+    "text": "What you want?",
+    "audioAsset": "peon/normalized/PeonWhat3.wav"
+  },
+  {
+    "id": "PeonWhat1.wav",
+    "text": "Yes?",
+    "audioAsset": "peon/normalized/PeonWhat1.wav"
+  },
+  {
+    "id": "PeonWarcry1.wav",
+    "text": "Why not?",
+    "audioAsset": "peon/normalized/PeonWarcry1.wav"
+  },
+  {
+    "id": "PeonAngry1.wav",
+    "text": "Whaaat?",
+    "audioAsset": "peon/normalized/PeonAngry1.wav"
+  },
+  {
+    "id": "PeonAngry2.wav",
+    "text": "Me busy, leave me alone!",
+    "audioAsset": "peon/normalized/PeonAngry2.wav"
+  },
+  {
+    "id": "PeonAngry3.wav",
+    "text": "No time for play.",
+    "audioAsset": "peon/normalized/PeonAngry3.wav"
+  }
+]
