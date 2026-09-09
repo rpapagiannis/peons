@@ -4,6 +4,8 @@ After CI passes on `main`, the release workflow advances the build number and mo
 
 ## Unreleased
 
+## 4.3.0 (build 15)
+
 ## 4.3.0 (build 14)
 
 - Add Warcraft Peon as the second character, using the original Warcraft II sprites and all 17 English Warcraft III recordings from Peon Ping, balanced to the existing sound levels.

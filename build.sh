@@ -20,7 +20,7 @@ cat > "$app/Contents/Info.plist" <<'PLIST'
     <key>CFBundleDisplayName</key><string>Peons</string>
     <key>CFBundlePackageType</key><string>APPL</string>
     <key>CFBundleShortVersionString</key><string>4.3.0</string>
-    <key>CFBundleVersion</key><string>14</string>
+    <key>CFBundleVersion</key><string>15</string>
     <key>LSMinimumSystemVersion</key><string>14.0</string>
     <key>LSUIElement</key><true/>
     <key>NSHighResolutionCapable</key><true/>
