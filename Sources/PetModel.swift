@@ -86,7 +86,7 @@ struct PetModel {
     mutating func selectCharacter(_ value: CharacterDefinition) {
         character = value
         phase = 0
-        // Keep a deliberate Down lock when applying the supported character.
+        // Character switches preserve motion, gestures, and a deliberate Down lock.
         face(frontLocked || abs(velocity.dx)<4 ? .front : velocity.dx>0 ? .right : .left)
     }
     mutating func configureDesktop(_ value: [DesktopSurface]) {

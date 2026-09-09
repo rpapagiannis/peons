@@ -1,0 +1,508 @@
+{
+  "clips" : [
+    {
+      "gainDB" : 1.3658259756570885,
+      "id" : "PeonReady1.wav",
+      "input" : {
+        "channels" : 1,
+        "durationSeconds" : 1.0071201814058957,
+        "frames" : 22207,
+        "fullScaleSamples" : 0,
+        "rmsDBFS" : -21.36582597565709,
+        "samplePeakDBFS" : -7.040403833164916,
+        "sampleRate" : 22050
+      },
+      "originalFile" : "assets/sounds/peon/PeonReady1.wav",
+      "originalSHA256" : "c821c124004af55b1d1bc97261e4f4521e234b78748addd585b3f03711f64584",
+      "output" : {
+        "channels" : 1,
+        "durationSeconds" : 1.0071201814058957,
+        "frames" : 22207,
+        "fullScaleSamples" : 0,
+        "rmsDBFS" : -19.999998150335937,
+        "samplePeakDBFS" : -5.674511032624028,
+        "sampleRate" : 22050
+      },
+      "outputFile" : "assets/sounds/peon/normalized/PeonReady1.wav",
+      "outputSHA256" : "cb307ce58257bca0f6c7e5a4e84aef595ea030d4a1167960fe41870e73225e54",
+      "peakLimited" : false,
+      "sourceCommit" : "5d1245fe0188c8da775ca8875c32ee7bf8d92c57",
+      "sourceURL" : "https://raw.githubusercontent.com/PeonPing/og-packs/5d1245fe0188c8da775ca8875c32ee7bf8d92c57/peon/sounds/PeonReady1.wav"
+    },
+    {
+      "gainDB" : -0.12214885378629603,
+      "id" : "PeonYes3.wav",
+      "input" : {
+        "channels" : 1,
+        "durationSeconds" : 0.9804081632653061,
+        "frames" : 21618,
+        "fullScaleSamples" : 0,
+        "rmsDBFS" : -19.877851146213704,
+        "samplePeakDBFS" : -4.135149855169217,
+        "sampleRate" : 22050
+      },
+      "originalFile" : "assets/sounds/peon/PeonYes3.wav",
+      "originalSHA256" : "18669847b60fc5b1bb41327dc075412aeb2a823d5a9d84476ddc2960baffa959",
+      "output" : {
+        "channels" : 1,
+        "durationSeconds" : 0.9804081632653061,
+        "frames" : 21618,
+        "fullScaleSamples" : 0,
+        "rmsDBFS" : -20.00000302377115,
+        "samplePeakDBFS" : -4.2571857330632765,
+        "sampleRate" : 22050
+      },
+      "outputFile" : "assets/sounds/peon/normalized/PeonYes3.wav",
+      "outputSHA256" : "6be3b78dc42145ddc9ba6e22f1ee396a7309e5ec810d30dd7b3ad458e83535da",
+      "peakLimited" : false,
+      "sourceCommit" : "5d1245fe0188c8da775ca8875c32ee7bf8d92c57",
+      "sourceURL" : "https://raw.githubusercontent.com/PeonPing/og-packs/5d1245fe0188c8da775ca8875c32ee7bf8d92c57/peon/sounds/PeonYes3.wav"
+    },
+    {
+      "gainDB" : 0.8485102856387456,
+      "id" : "PeonWhat4.wav",
+      "input" : {
+        "channels" : 1,
+        "durationSeconds" : 1.2277097505668935,
+        "frames" : 27071,
+        "fullScaleSamples" : 0,
+        "rmsDBFS" : -20.848510285638746,
+        "samplePeakDBFS" : -4.133869851781702,
+        "sampleRate" : 22050
+      },
+      "originalFile" : "assets/sounds/peon/PeonWhat4.wav",
+      "originalSHA256" : "6ee4f9d9f9d2fede1f953a196de8875dba2ffefa0c5c732adad3de45bbaf090e",
+      "output" : {
+        "channels" : 1,
+        "durationSeconds" : 1.2277097505668935,
+        "frames" : 27071,
+        "fullScaleSamples" : 0,
+        "rmsDBFS" : -19.99999712171933,
+        "samplePeakDBFS" : -3.2854456255086646,
+        "sampleRate" : 22050
+      },
+      "outputFile" : "assets/sounds/peon/normalized/PeonWhat4.wav",
+      "outputSHA256" : "d73ea4a7f078fafde585a0a161a0f192c4a5faf3e35b07d76c3918de5247e64c",
+      "peakLimited" : false,
+      "sourceCommit" : "5d1245fe0188c8da775ca8875c32ee7bf8d92c57",
+      "sourceURL" : "https://raw.githubusercontent.com/PeonPing/og-packs/5d1245fe0188c8da775ca8875c32ee7bf8d92c57/peon/sounds/PeonWhat4.wav"
+    },
+    {
+      "gainDB" : 3.1657187593756406,
+      "id" : "PeonYes4.wav",
+      "input" : {
+        "channels" : 1,
+        "durationSeconds" : 1.0970521541950113,
+        "frames" : 24190,
+        "fullScaleSamples" : 0,
+        "rmsDBFS" : -23.20701897179344,
+        "samplePeakDBFS" : -6.17571875937564,
+        "sampleRate" : 22050
+      },
+      "originalFile" : "assets/sounds/peon/PeonYes4.wav",
+      "originalSHA256" : "89b9f19fec29fde3b513cc98bcf1614a6d264850f65e6816a4483ac49dc34cc2",
+      "output" : {
+        "channels" : 1,
+        "durationSeconds" : 1.0970521541950113,
+        "frames" : 24190,
+        "fullScaleSamples" : 0,
+        "rmsDBFS" : -20.041301425620546,
+        "samplePeakDBFS" : -3.010103154935409,
+        "sampleRate" : 22050
+      },
+      "outputFile" : "assets/sounds/peon/normalized/PeonYes4.wav",
+      "outputSHA256" : "7a3fba0995cf7b8e312033f6dcce35c6d71c2105f40b49cb79e5a6d0127bc07a",
+      "peakLimited" : true,
+      "sourceCommit" : "5d1245fe0188c8da775ca8875c32ee7bf8d92c57",
+      "sourceURL" : "https://raw.githubusercontent.com/PeonPing/og-packs/5d1245fe0188c8da775ca8875c32ee7bf8d92c57/peon/sounds/PeonYes4.wav"
+    },
+    {
+      "gainDB" : 4.3586386792484575,
+      "id" : "PeonYes1.wav",
+      "input" : {
+        "channels" : 1,
+        "durationSeconds" : 0.7604081632653061,
+        "frames" : 16767,
+        "fullScaleSamples" : 0,
+        "rmsDBFS" : -24.358638679248457,
+        "samplePeakDBFS" : -8.120127757907373,
+        "sampleRate" : 22050
+      },
+      "originalFile" : "assets/sounds/peon/PeonYes1.wav",
+      "originalSHA256" : "a644ec5632e566df6c057e124319884b5123eea5d5f54b04280b097c2231cc0b",
+      "output" : {
+        "channels" : 1,
+        "durationSeconds" : 0.7604081632653061,
+        "frames" : 16767,
+        "fullScaleSamples" : 0,
+        "rmsDBFS" : -19.999998635974144,
+        "samplePeakDBFS" : -3.7614112733373704,
+        "sampleRate" : 22050
+      },
+      "outputFile" : "assets/sounds/peon/normalized/PeonYes1.wav",
+      "outputSHA256" : "cc49dcba25a73a06f1a1c2fd62ff1624230de772266fcf038e9709f7970444f9",
+      "peakLimited" : false,
+      "sourceCommit" : "5d1245fe0188c8da775ca8875c32ee7bf8d92c57",
+      "sourceURL" : "https://raw.githubusercontent.com/PeonPing/og-packs/5d1245fe0188c8da775ca8875c32ee7bf8d92c57/peon/sounds/PeonYes1.wav"
+    },
+    {
+      "gainDB" : 3.0183448230840426,
+      "id" : "PeonYes2.wav",
+      "input" : {
+        "channels" : 1,
+        "durationSeconds" : 0.9972789115646259,
+        "frames" : 21990,
+        "fullScaleSamples" : 0,
+        "rmsDBFS" : -23.018344823084043,
+        "samplePeakDBFS" : -7.193171652042009,
+        "sampleRate" : 22050
+      },
+      "originalFile" : "assets/sounds/peon/PeonYes2.wav",
+      "originalSHA256" : "1aaee40174ef4f6109dadc1d28edcbcd63eae27bd9e0b520c40c17e988a365d6",
+      "output" : {
+        "channels" : 1,
+        "durationSeconds" : 0.9972789115646259,
+        "frames" : 21990,
+        "fullScaleSamples" : 0,
+        "rmsDBFS" : -19.999997689245333,
+        "samplePeakDBFS" : -4.174923810601543,
+        "sampleRate" : 22050
+      },
+      "outputFile" : "assets/sounds/peon/normalized/PeonYes2.wav",
+      "outputSHA256" : "657addca756b74c4106222e397d56e561a74b3ffcc6846d228115153a93b3ba4",
+      "peakLimited" : false,
+      "sourceCommit" : "5d1245fe0188c8da775ca8875c32ee7bf8d92c57",
+      "sourceURL" : "https://raw.githubusercontent.com/PeonPing/og-packs/5d1245fe0188c8da775ca8875c32ee7bf8d92c57/peon/sounds/PeonYes2.wav"
+    },
+    {
+      "gainDB" : -0.6470717608188927,
+      "id" : "PeonYesAttack3.wav",
+      "input" : {
+        "channels" : 1,
+        "durationSeconds" : 0.8619954648526077,
+        "frames" : 19007,
+        "fullScaleSamples" : 0,
+        "rmsDBFS" : -19.352928239181107,
+        "samplePeakDBFS" : -4.300132659073791,
+        "sampleRate" : 22050
+      },
+      "originalFile" : "assets/sounds/peon/PeonYesAttack3.wav",
+      "originalSHA256" : "097361087515743db44ee93bfc4865fc331d270cb512805844610259a012b869",
+      "output" : {
+        "channels" : 1,
+        "durationSeconds" : 0.8619954648526077,
+        "frames" : 19007,
+        "fullScaleSamples" : 0,
+        "rmsDBFS" : -20.000003191478083,
+        "samplePeakDBFS" : -4.94727261024668,
+        "sampleRate" : 22050
+      },
+      "outputFile" : "assets/sounds/peon/normalized/PeonYesAttack3.wav",
+      "outputSHA256" : "f4380d2b8387f679139e83316c5ce90b731e54d393eec43a5c8b964f03924b82",
+      "peakLimited" : false,
+      "sourceCommit" : "5d1245fe0188c8da775ca8875c32ee7bf8d92c57",
+      "sourceURL" : "https://raw.githubusercontent.com/PeonPing/og-packs/5d1245fe0188c8da775ca8875c32ee7bf8d92c57/peon/sounds/PeonYesAttack3.wav"
+    },
+    {
+      "gainDB" : -1.128207460320997,
+      "id" : "PeonWorkComplete.wav",
+      "input" : {
+        "channels" : 2,
+        "durationSeconds" : 1.8024489795918368,
+        "frames" : 39744,
+        "fullScaleSamples" : 0,
+        "rmsDBFS" : -18.871792539679003,
+        "samplePeakDBFS" : -1.8825151499171229,
+        "sampleRate" : 22050
+      },
+      "originalFile" : "assets/sounds/peon/PeonWorkComplete.wav",
+      "originalSHA256" : "e6d666c474ea82b2e4b6f22756a9e95218fa2f6053a138f68e6237e196803ae6",
+      "output" : {
+        "channels" : 2,
+        "durationSeconds" : 1.8024489795918368,
+        "frames" : 39744,
+        "fullScaleSamples" : 0,
+        "rmsDBFS" : -19.999997002541182,
+        "samplePeakDBFS" : -3.0108529080336788,
+        "sampleRate" : 22050
+      },
+      "outputFile" : "assets/sounds/peon/normalized/PeonWorkComplete.wav",
+      "outputSHA256" : "b3fc051ba5876ac700167888ac5f6a942366eb76fc1eefcd42b530d0f708652d",
+      "peakLimited" : false,
+      "sourceCommit" : "5d1245fe0188c8da775ca8875c32ee7bf8d92c57",
+      "sourceURL" : "https://raw.githubusercontent.com/PeonPing/og-packs/5d1245fe0188c8da775ca8875c32ee7bf8d92c57/peon/sounds/PeonWorkComplete.wav"
+    },
+    {
+      "gainDB" : 0.8838070712697466,
+      "id" : "PeonAngry4.wav",
+      "input" : {
+        "channels" : 1,
+        "durationSeconds" : 1.8923809523809523,
+        "frames" : 41727,
+        "fullScaleSamples" : 0,
+        "rmsDBFS" : -20.883807071269747,
+        "samplePeakDBFS" : -3.9048262880294744,
+        "sampleRate" : 22050
+      },
+      "originalFile" : "assets/sounds/peon/PeonAngry4.wav",
+      "originalSHA256" : "39493727ee0dc6f134ee1c666c63240c6c9df77bceb8b529b549aa980d3849df",
+      "output" : {
+        "channels" : 1,
+        "durationSeconds" : 1.8923809523809523,
+        "frames" : 41727,
+        "fullScaleSamples" : 0,
+        "rmsDBFS" : -19.999996809178086,
+        "samplePeakDBFS" : -3.0209809142006483,
+        "sampleRate" : 22050
+      },
+      "outputFile" : "assets/sounds/peon/normalized/PeonAngry4.wav",
+      "outputSHA256" : "e10abfe38ffec689e89b368c06fab5d8b0860a8fc64885bbc7c979fc511bbecb",
+      "peakLimited" : false,
+      "sourceCommit" : "5d1245fe0188c8da775ca8875c32ee7bf8d92c57",
+      "sourceURL" : "https://raw.githubusercontent.com/PeonPing/og-packs/5d1245fe0188c8da775ca8875c32ee7bf8d92c57/peon/sounds/PeonAngry4.wav"
+    },
+    {
+      "gainDB" : -2.5318768838090904,
+      "id" : "PeonDeath.wav",
+      "input" : {
+        "channels" : 1,
+        "durationSeconds" : 1.8459863945578232,
+        "frames" : 40704,
+        "fullScaleSamples" : 0,
+        "rmsDBFS" : -17.79817028204231,
+        "samplePeakDBFS" : -0.4781231161909094,
+        "sampleRate" : 22050
+      },
+      "originalFile" : "assets/sounds/peon/PeonDeath.wav",
+      "originalSHA256" : "c46dd952a4dca36cc3e71b5594d6b102ad8366380ca411190e38290090d258c8",
+      "output" : {
+        "channels" : 1,
+        "durationSeconds" : 1.8459863945578232,
+        "frames" : 40704,
+        "fullScaleSamples" : 0,
+        "rmsDBFS" : -20.330044384411515,
+        "samplePeakDBFS" : -3.010103154935409,
+        "sampleRate" : 22050
+      },
+      "outputFile" : "assets/sounds/peon/normalized/PeonDeath.wav",
+      "outputSHA256" : "02653ce0d0ec676553c28845c767a36b24b86a530eda594be2f28dd2dc32da88",
+      "peakLimited" : true,
+      "sourceCommit" : "5d1245fe0188c8da775ca8875c32ee7bf8d92c57",
+      "sourceURL" : "https://raw.githubusercontent.com/PeonPing/og-packs/5d1245fe0188c8da775ca8875c32ee7bf8d92c57/peon/sounds/PeonDeath.wav"
+    },
+    {
+      "gainDB" : 0.6222601221051427,
+      "id" : "PeonWhat2.wav",
+      "input" : {
+        "channels" : 1,
+        "durationSeconds" : 0.5151473922902494,
+        "frames" : 11359,
+        "fullScaleSamples" : 0,
+        "rmsDBFS" : -20.622260122105143,
+        "samplePeakDBFS" : -7.963572786079073,
+        "sampleRate" : 22050
+      },
+      "originalFile" : "assets/sounds/peon/PeonWhat2.wav",
+      "originalSHA256" : "51d3de60bbb1973f291b7059dc1a8c0d44ff7f524d31881c4ab790c5a2922ef2",
+      "output" : {
+        "channels" : 1,
+        "durationSeconds" : 0.5151473922902494,
+        "frames" : 11359,
+        "fullScaleSamples" : 0,
+        "rmsDBFS" : -19.999995895290446,
+        "samplePeakDBFS" : -7.341264945857943,
+        "sampleRate" : 22050
+      },
+      "outputFile" : "assets/sounds/peon/normalized/PeonWhat2.wav",
+      "outputSHA256" : "06e1935892405be9c2c5b07c31bc1bba6fb625c7b5136f7895916e02b7a385a4",
+      "peakLimited" : false,
+      "sourceCommit" : "5d1245fe0188c8da775ca8875c32ee7bf8d92c57",
+      "sourceURL" : "https://raw.githubusercontent.com/PeonPing/og-packs/5d1245fe0188c8da775ca8875c32ee7bf8d92c57/peon/sounds/PeonWhat2.wav"
+    },
+    {
+      "gainDB" : 1.915416326332604,
+      "id" : "PeonWhat3.wav",
+      "input" : {
+        "channels" : 1,
+        "durationSeconds" : 1.0158276643990929,
+        "frames" : 22399,
+        "fullScaleSamples" : 0,
+        "rmsDBFS" : -21.915416326332604,
+        "samplePeakDBFS" : -6.040237446718933,
+        "sampleRate" : 22050
+      },
+      "originalFile" : "assets/sounds/peon/PeonWhat3.wav",
+      "originalSHA256" : "4e8197030f01cbaef968ddb9566f19bfd68b3af622748238a3049d218bb64eed",
+      "output" : {
+        "channels" : 1,
+        "durationSeconds" : 1.0158276643990929,
+        "frames" : 22399,
+        "fullScaleSamples" : 0,
+        "rmsDBFS" : -20.000002593855207,
+        "samplePeakDBFS" : -4.124915105786206,
+        "sampleRate" : 22050
+      },
+      "outputFile" : "assets/sounds/peon/normalized/PeonWhat3.wav",
+      "outputSHA256" : "d4a623cd14617981c0dd646495d57b1938141ab256807a25b198d3490ae2472a",
+      "peakLimited" : false,
+      "sourceCommit" : "5d1245fe0188c8da775ca8875c32ee7bf8d92c57",
+      "sourceURL" : "https://raw.githubusercontent.com/PeonPing/og-packs/5d1245fe0188c8da775ca8875c32ee7bf8d92c57/peon/sounds/PeonWhat3.wav"
+    },
+    {
+      "gainDB" : 0.6108507025819279,
+      "id" : "PeonWhat1.wav",
+      "input" : {
+        "channels" : 1,
+        "durationSeconds" : 0.676235827664399,
+        "frames" : 14911,
+        "fullScaleSamples" : 0,
+        "rmsDBFS" : -20.610850702581928,
+        "samplePeakDBFS" : -6.065779504126692,
+        "sampleRate" : 22050
+      },
+      "originalFile" : "assets/sounds/peon/PeonWhat1.wav",
+      "originalSHA256" : "d4f5696d9db6875c80c8dccf95f6d8047a4564b214be90792b8a766e313106a3",
+      "output" : {
+        "channels" : 1,
+        "durationSeconds" : 0.676235827664399,
+        "frames" : 14911,
+        "fullScaleSamples" : 0,
+        "rmsDBFS" : -20.00000611570863,
+        "samplePeakDBFS" : -5.454692498412211,
+        "sampleRate" : 22050
+      },
+      "outputFile" : "assets/sounds/peon/normalized/PeonWhat1.wav",
+      "outputSHA256" : "eb363f030eccbb26ee83dd11eb9ececd81665f081e327d40dbe7c633f9d05e9c",
+      "peakLimited" : false,
+      "sourceCommit" : "5d1245fe0188c8da775ca8875c32ee7bf8d92c57",
+      "sourceURL" : "https://raw.githubusercontent.com/PeonPing/og-packs/5d1245fe0188c8da775ca8875c32ee7bf8d92c57/peon/sounds/PeonWhat1.wav"
+    },
+    {
+      "gainDB" : -1.33391994997967,
+      "id" : "PeonWarcry1.wav",
+      "input" : {
+        "channels" : 1,
+        "durationSeconds" : 0.7749206349206349,
+        "frames" : 17087,
+        "fullScaleSamples" : 0,
+        "rmsDBFS" : -18.66608005002033,
+        "samplePeakDBFS" : -4.064181796310117,
+        "sampleRate" : 22050
+      },
+      "originalFile" : "assets/sounds/peon/PeonWarcry1.wav",
+      "originalSHA256" : "a8405dccabe1de88a421e77526cc9f89acb6e1c0eb43011e31a63305d2a9c310",
+      "output" : {
+        "channels" : 1,
+        "durationSeconds" : 0.7749206349206349,
+        "frames" : 17087,
+        "fullScaleSamples" : 0,
+        "rmsDBFS" : -20.000006664058834,
+        "samplePeakDBFS" : -5.398251840474478,
+        "sampleRate" : 22050
+      },
+      "outputFile" : "assets/sounds/peon/normalized/PeonWarcry1.wav",
+      "outputSHA256" : "9c632af993e5f97ae25ab76d02bc9f32d21c916d0d4c7ff47b9c7bfdfbff6f09",
+      "peakLimited" : false,
+      "sourceCommit" : "5d1245fe0188c8da775ca8875c32ee7bf8d92c57",
+      "sourceURL" : "https://raw.githubusercontent.com/PeonPing/og-packs/5d1245fe0188c8da775ca8875c32ee7bf8d92c57/peon/sounds/PeonWarcry1.wav"
+    },
+    {
+      "gainDB" : 0.03465895604616209,
+      "id" : "PeonAngry1.wav",
+      "input" : {
+        "channels" : 1,
+        "durationSeconds" : 1.0477551020408162,
+        "frames" : 23103,
+        "fullScaleSamples" : 0,
+        "rmsDBFS" : -20.060973515180326,
+        "samplePeakDBFS" : -3.044658956046162,
+        "sampleRate" : 22050
+      },
+      "originalFile" : "assets/sounds/peon/PeonAngry1.wav",
+      "originalSHA256" : "12383949b2a8241fd6f5a6edc03c0655f9765d0744a7aecc709d6026bb8f4698",
+      "output" : {
+        "channels" : 1,
+        "durationSeconds" : 1.0477551020408162,
+        "frames" : 23103,
+        "fullScaleSamples" : 0,
+        "rmsDBFS" : -20.026311130677765,
+        "samplePeakDBFS" : -3.010103154935409,
+        "sampleRate" : 22050
+      },
+      "outputFile" : "assets/sounds/peon/normalized/PeonAngry1.wav",
+      "outputSHA256" : "6a7462cfa92cb33595025a4f5761f306323eefa240ef6bdfe9b3bff1bf2026a8",
+      "peakLimited" : true,
+      "sourceCommit" : "5d1245fe0188c8da775ca8875c32ee7bf8d92c57",
+      "sourceURL" : "https://raw.githubusercontent.com/PeonPing/og-packs/5d1245fe0188c8da775ca8875c32ee7bf8d92c57/peon/sounds/PeonAngry1.wav"
+    },
+    {
+      "gainDB" : -1.6666200163196052,
+      "id" : "PeonAngry2.wav",
+      "input" : {
+        "channels" : 1,
+        "durationSeconds" : 2.078140589569161,
+        "frames" : 45823,
+        "fullScaleSamples" : 0,
+        "rmsDBFS" : -18.333379983680395,
+        "samplePeakDBFS" : -4.033762773345631,
+        "sampleRate" : 22050
+      },
+      "originalFile" : "assets/sounds/peon/PeonAngry2.wav",
+      "originalSHA256" : "bbf910617a548e55a45d2a7ebc74e45fa18e8bc6a3004f84e6e1af94434b146d",
+      "output" : {
+        "channels" : 1,
+        "durationSeconds" : 2.078140589569161,
+        "frames" : 45823,
+        "fullScaleSamples" : 0,
+        "rmsDBFS" : -19.99999860626068,
+        "samplePeakDBFS" : -5.700531221341553,
+        "sampleRate" : 22050
+      },
+      "outputFile" : "assets/sounds/peon/normalized/PeonAngry2.wav",
+      "outputSHA256" : "95c98a2b47875ba13c13f2eb3d26435ef248355f91756a7b2195d7804a4f14d7",
+      "peakLimited" : false,
+      "sourceCommit" : "5d1245fe0188c8da775ca8875c32ee7bf8d92c57",
+      "sourceURL" : "https://raw.githubusercontent.com/PeonPing/og-packs/5d1245fe0188c8da775ca8875c32ee7bf8d92c57/peon/sounds/PeonAngry2.wav"
+    },
+    {
+      "gainDB" : 0.800271847547549,
+      "id" : "PeonAngry3.wav",
+      "input" : {
+        "channels" : 1,
+        "durationSeconds" : 1.268344671201814,
+        "frames" : 27967,
+        "fullScaleSamples" : 0,
+        "rmsDBFS" : -20.80027184754755,
+        "samplePeakDBFS" : -5.147273012634771,
+        "sampleRate" : 22050
+      },
+      "originalFile" : "assets/sounds/peon/PeonAngry3.wav",
+      "originalSHA256" : "cf68875ec1600020d304c4b3c23a0116509acbf8e61d67d30c6d6ffcb9f13b69",
+      "output" : {
+        "channels" : 1,
+        "durationSeconds" : 1.268344671201814,
+        "frames" : 27967,
+        "fullScaleSamples" : 0,
+        "rmsDBFS" : -20.000001741498608,
+        "samplePeakDBFS" : -4.346790076480119,
+        "sampleRate" : 22050
+      },
+      "outputFile" : "assets/sounds/peon/normalized/PeonAngry3.wav",
+      "outputSHA256" : "84933711eaf57802e2b75e80f12bcbabb41e6f10db7c6ea60fe45d60c10db24a",
+      "peakLimited" : false,
+      "sourceCommit" : "5d1245fe0188c8da775ca8875c32ee7bf8d92c57",
+      "sourceURL" : "https://raw.githubusercontent.com/PeonPing/og-packs/5d1245fe0188c8da775ca8875c32ee7bf8d92c57/peon/sounds/PeonAngry3.wav"
+    }
+  ],
+  "method" : "One constant gain per clip, measured over all decoded samples and channels. No trimming, compression, denoising, or playback.",
+  "minimumSamplePeakHeadroomDB" : 3,
+  "outputFormat" : "16-bit signed little-endian PCM WAV; original sample rate and channel count",
+  "samplePeakCeilingDBFS" : -3.01,
+  "schemaVersion" : 1,
+  "script" : "scripts/prepare_audio.swift",
+  "sources" : {
+    "PeonPing/og-packs (peon 1.1.0)" : "5d1245fe0188c8da775ca8875c32ee7bf8d92c57"
+  },
+  "targetRMSDBFS" : -20,
+  "validation" : "Outputs were decoded again and checked for preserved frame count, duration, rate and channels; RMS within 0.02 dB of expected gain; sample peaks at or below -3 dBFS; no full-scale samples. This is objective level balancing, not a listening test or perceptual LUFS normalization."
+}

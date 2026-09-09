@@ -195,6 +195,22 @@ do {
     try encode(normalization, to: pack.appendingPathComponent("normalization.json"))
     try encode(lines, to: pack.appendingPathComponent("lines.json"))
 
+    let peonPack = root.appendingPathComponent("assets/sounds/peon")
+    let peonLines = try JSONDecoder().decode([Line].self, from: Data(contentsOf: peonPack.appendingPathComponent("lines.json")))
+    let peonOriginals = try JSONDecoder().decode([UpstreamClip].self, from: Data(contentsOf: root.appendingPathComponent("research/peon-audio-provenance.json")))
+    let peonByName = Dictionary(uniqueKeysWithValues: peonOriginals.map { (URL(fileURLWithPath:$0.file).lastPathComponent,$0) })
+    let peonCommit = "5d1245fe0188c8da775ca8875c32ee7bf8d92c57"
+    try require(peonLines.count == 17 && Set(peonLines.map(\.id)) == Set(peonByName.keys), "Expected the complete 17-clip Peon Ping peon pack")
+    let peonDerivations = try peonLines.map { line in
+        try require(line.audioAsset == "peon/normalized/" + line.id, "Unexpected peon output path")
+        return try normalize(peonByName[line.id]!, id:line.id, root:root,
+                             outputFile:"assets/sounds/" + line.audioAsset, sourceCommit:peonCommit)
+    }
+    let peonNormalization = Normalization(targetRMSDBFS:targetRMS, samplePeakCeilingDBFS:peakCeiling,
+                                          minimumSamplePeakHeadroomDB:3,
+                                          sources:["PeonPing/og-packs (peon 1.1.0)":peonCommit], clips:peonDerivations)
+    try encode(peonNormalization, to:peonPack.appendingPathComponent("normalization.json"))
+
     struct Effect: Decodable { let id: String; let audioAsset: String }
     let effectsPack = root.appendingPathComponent("assets/sounds/effects")
     let effects = try JSONDecoder().decode([Effect].self, from: Data(contentsOf: effectsPack.appendingPathComponent("effects.json")))
@@ -210,7 +226,7 @@ do {
 
     // openpeon.json stays the unmodified upstream 14-clip manifest, retained for provenance.
     // lines.json is the actual 17-clip playback inventory; normalization.json records its derivation.
-    print("Prepared and validated \(lines.count) voices and \(effects.count) effect. Original MP3s were unchanged.")
+    print("Prepared and validated \(lines.count + peonLines.count) voices and \(effects.count) effect. Original recordings were unchanged.")
 } catch {
     FileHandle.standardError.write(Data("Audio preparation failed: \(error)\n".utf8))
     exit(1)
